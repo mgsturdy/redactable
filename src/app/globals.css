@@ -1,26 +1,121 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ============================================================
+   Redactable — Design tokens
+   Base: Linear (near-black canvas, Inter Variable, weight 510)
+   Twist: redaction-bar black motif + amber accent
+   ============================================================ */
+
+@theme {
+  /* Surface — Linear luminance stack */
+  --color-canvas: #08090a;       /* marketing black */
+  --color-panel:  #0f1011;       /* panel dark */
+  --color-surface: #191a1b;      /* elevated surface */
+  --color-surface-2: #28282c;    /* hover / raised */
+
+  /* Text */
+  --color-ink:        #f7f8f8;   /* primary */
+  --color-ink-2:      #d0d6e0;   /* secondary */
+  --color-ink-muted:  #8a8f98;   /* muted */
+  --color-ink-quiet:  #62666d;   /* disabled / timestamps */
+
+  /* Borders */
+  --color-border:         rgba(255, 255, 255, 0.08);
+  --color-border-subtle:  rgba(255, 255, 255, 0.05);
+
+  /* Redaction + accent — our identity */
+  --color-redact: #000000;       /* pure black bar */
+  --color-amber:   #f5a623;      /* primary accent */
+  --color-amber-hover: #ffb84d;
+  --color-amber-muted: rgba(245, 166, 35, 0.12);
+
+  /* Status */
+  --color-ok: #10b981;
+
+  /* Type */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* Motion */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-quint: cubic-bezier(0.83, 0, 0.17, 1);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Inter Variable OpenType — Linear's signature look */
+html {
+  font-feature-settings: "cv01", "ss03";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  min-height: 100dvh;
+}
+
+::selection {
+  background: var(--color-amber);
+  color: #000;
+}
+
+/* ============================================================
+   Redaction-bar logo reveal
+   A black bar sweeps across "edacta" on mount and stays
+   ============================================================ */
+@keyframes redact-sweep {
+  0% {
+    transform: scaleX(0);
+    transform-origin: left center;
+  }
+  60% {
+    transform: scaleX(1);
+    transform-origin: left center;
+  }
+  60.01% {
+    transform-origin: right center;
+  }
+  100% {
+    transform: scaleX(1);
+    transform-origin: right center;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.8s var(--ease-out-expo) both;
+}
+
+.animate-pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+/* Noise grain overlay — subtle, for that "serious tool" texture */
+.grain::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0.025;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
