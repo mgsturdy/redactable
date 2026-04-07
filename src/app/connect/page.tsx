@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { NetworkPanel } from "@/components/NetworkPanel";
 import { ProofAnimation } from "@/components/ProofAnimation";
-import { requestGmailAccessToken } from "@/lib/google-auth";
+import { requestGmailAccessToken, OAuthDismissedError } from "@/lib/google-auth";
 import { listMessages, fetchRawMessage, extractPreview } from "@/lib/gmail";
 import { proveEmail, type ProofResult } from "@/lib/prover";
 
@@ -21,7 +21,7 @@ type EmailCandidate = {
 };
 
 type ConnectState =
-  | { phase: "idle" }
+  | { phase: "idle"; hint?: string }
   | { phase: "auth" }
   | { phase: "fetching"; step: string }
   | { phase: "picking"; candidates: EmailCandidate[] }
@@ -36,7 +36,19 @@ export default function ConnectPage() {
   async function startFlow() {
     try {
       setState({ phase: "auth" });
-      const token = await requestGmailAccessToken();
+      let token: string;
+      try {
+        token = await requestGmailAccessToken();
+      } catch (err) {
+        if (err instanceof OAuthDismissedError) {
+          setState({
+            phase: "idle",
+            hint: "Sign-in was cancelled. Click Connect again — and if you don't see the popup, allow popups for this site in your browser.",
+          });
+          return;
+        }
+        throw err;
+      }
 
       setState({ phase: "fetching", step: "Searching your inbox..." });
       const messages = await listMessages(token, GMAIL_QUERY, 5);
@@ -139,7 +151,9 @@ export default function ConnectPage() {
           </p>
 
           <div className="mt-12">
-            {state.phase === "idle" && <IdleCard onStart={startFlow} />}
+            {state.phase === "idle" && (
+              <IdleCard onStart={startFlow} hint={state.hint} />
+            )}
             {state.phase === "auth" && (
               <StatusCard
                 title="Waiting on Google..."
@@ -194,7 +208,13 @@ export default function ConnectPage() {
    STATE CARDS
    ============================================================ */
 
-function IdleCard({ onStart }: { onStart: () => void }) {
+function IdleCard({
+  onStart,
+  hint,
+}: {
+  onStart: () => void;
+  hint?: string;
+}) {
   return (
     <div className="rounded-lg border border-[var(--color-border)] bg-white/[0.02] p-8">
       <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--color-ink-quiet)] mb-3">
@@ -212,6 +232,11 @@ function IdleCard({ onStart }: { onStart: () => void }) {
         </span>{" "}
         — you can confirm that in Google&apos;s consent popup.
       </p>
+      {hint && (
+        <div className="mb-6 rounded-sm border border-[var(--color-amber)] bg-[var(--color-amber-muted)] px-4 py-3 text-[13px] text-[var(--color-ink-2)]">
+          {hint}
+        </div>
+      )}
       <button
         onClick={onStart}
         className="inline-flex items-center gap-2 rounded-sm bg-[var(--color-amber)] hover:bg-[var(--color-amber-hover)] text-black px-5 py-3 text-[15px] font-medium transition"

@@ -84,6 +84,17 @@ function loadGis(): Promise<void> {
 }
 
 /**
+ * Distinct error class so the UI can handle user-dismissed popups
+ * gracefully instead of treating them as a crash.
+ */
+export class OAuthDismissedError extends Error {
+  constructor(message = "You closed the Google sign-in window.") {
+    super(message);
+    this.name = "OAuthDismissedError";
+  }
+}
+
+/**
  * Prompt the user to authorize Gmail read access and return the access token.
  * Token is only valid for ~1 hour. We request it fresh every session.
  */
@@ -117,10 +128,22 @@ export async function requestGmailAccessToken(): Promise<string> {
         resolve(response.access_token);
       },
       error_callback: (err) => {
-        reject(new Error(err.message ?? `OAuth error: ${err.type}`));
+        // GIS fires this for popup_closed, popup_failed_to_open, user_cancel, etc.
+        // All of those are user-dismissal, not crashes.
+        const type = err.type ?? "";
+        if (
+          type === "popup_closed" ||
+          type === "popup_failed_to_open" ||
+          type === "user_cancel"
+        ) {
+          reject(new OAuthDismissedError());
+          return;
+        }
+        reject(new Error(err.message ?? `OAuth error: ${type || "unknown"}`));
       },
     });
-    client.requestAccessToken({ prompt: "consent" });
+    // Don't force re-consent every call — let GIS use cached consent if available.
+    client.requestAccessToken();
   });
 }
 
