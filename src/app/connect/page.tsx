@@ -10,18 +10,24 @@ import { manualGmailAuth } from "@/lib/google-auth-manual";
 import { listMessages, fetchRawMessage, extractPreview } from "@/lib/gmail";
 import { proveEmail, type ProofResult } from "@/lib/prover";
 
-// saugardev/ProofStripePayment — testing as a fallback because rutefig/UberReceipt
-// hits an SDK bug in the chunked-zkey loader (Failed to parse URL from circuit.zkey).
-// Stripe blueprint is by a different author with different circuit packaging, so if
-// it works we know UberReceipt's specific chunking is broken; if it fails the same
-// way, the SDK itself has a systemic issue.
-//
-// Bonus: external_inputs is empty for this one (no wallet address required).
-const BLUEPRINT_SLUG = "saugardev/ProofStripePayment@v1";
-const GMAIL_QUERY = "from:stripe.com";
+// rutefig/UberReceipt@v11 is the correct blueprint for US Uber receipts.
+// US Uber emails arrive From: noreply@uber.com but are DKIM-signed by the
+// sptrans.uber.com subdomain, and the SDK matches blueprint sender_domain
+// against the DKIM d= tag (NOT the From: header) — so this blueprint with
+// sender_domain: sptrans.uber.com is the right one, not Bisht13's uber.com one.
+// Verified by reading the SDK source on day 1.
+const BLUEPRINT_SLUG = "rutefig/UberReceipt@v11";
+const GMAIL_QUERY = "from:uber.com";
 
-const EXTERNAL_INPUTS: Array<{ name: string; value: string; maxLength: number }> =
-  [];
+// Blueprint requires a wallet_address external input (max_length 64).
+// V0 uses the zero address as a placeholder; V1 will let users supply their own.
+const EXTERNAL_INPUTS: Array<{ name: string; value: string; maxLength: number }> = [
+  {
+    name: "wallet_address",
+    value: "0x0000000000000000000000000000000000000000",
+    maxLength: 64,
+  },
+];
 
 type EmailCandidate = {
   id: string;
@@ -171,7 +177,7 @@ export default function ConnectPage() {
         {/* Left: flow */}
         <div className="animate-fade-up">
           <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--color-amber)] mb-6">
-            V0 · Proof flow · Stripe receipts
+            V0 · Proof flow · Uber rides
           </div>
           <h1 className="font-display text-[56px] sm:text-[72px] leading-[0.95] tracking-[-0.02em] text-[var(--color-ink)]">
             Prove one in
@@ -262,10 +268,9 @@ function IdleCard({
         only in this tab. The only thing we&apos;re looking for is
         <span className="font-mono text-[var(--color-amber)]">
           {" "}
-          from:stripe.com
+          from:uber.com
         </span>{" "}
-        — payment receipts from any SaaS that uses Stripe (Substack,
-        ChatGPT Plus, Notion, Figma, etc.). You can confirm the scope in
+        — your Uber ride receipts. You can confirm the scope in
         Google&apos;s consent popup.
       </p>
       {hint && (
