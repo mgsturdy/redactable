@@ -10,8 +10,10 @@ import { manualGmailAuth } from "@/lib/google-auth-manual";
 import { listMessages, fetchRawMessage, extractPreview } from "@/lib/gmail";
 import { proveEmail, type ProofResult } from "@/lib/prover";
 
-// SDK requires the @vN suffix on blueprint slugs.
-const BLUEPRINT_SLUG = "rutefig/UberReceipt@v1";
+// SDK requires the @vN suffix on blueprint slugs. Bisht13/UberReceipt@v4
+// targets sender_domain=uber.com (US Uber rides), unlike rutefig/UberReceipt
+// which is pinned to sptrans.uber.com (Portuguese transit).
+const BLUEPRINT_SLUG = "Bisht13/UberReceipt@v4";
 const GMAIL_QUERY = "from:uber.com";
 
 type EmailCandidate = {
