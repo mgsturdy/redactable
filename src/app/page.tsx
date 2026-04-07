@@ -27,7 +27,7 @@ function Nav() {
   return (
     <nav className="sticky top-0 z-40 backdrop-blur-md bg-[var(--color-canvas)]/70 border-b border-[var(--color-border-subtle)]">
       <div className="max-w-[1280px] mx-auto flex items-center justify-between px-6 py-4">
-        <Logo size="sm" />
+        <Logo size="sm" variant="reactive" />
         <div className="hidden md:flex items-center gap-8 text-[14px] text-[var(--color-ink-2)]">
           <a href="#thesis" className="hover:text-[var(--color-ink)] transition">
             Thesis
@@ -49,10 +49,10 @@ function Nav() {
           </a>
         </div>
         <a
-          href="#waitlist"
+          href="/connect"
           className="inline-flex items-center rounded-sm bg-[var(--color-amber)] hover:bg-[var(--color-amber-hover)] text-black px-4 py-2 text-[14px] font-medium transition"
         >
-          Join waitlist
+          Try the demo →
         </a>
       </div>
     </nav>
@@ -92,19 +92,23 @@ function Hero() {
 
           <div className="mt-10 flex flex-wrap items-center gap-4">
             <a
-              href="#waitlist"
+              href="/connect"
               className="inline-flex items-center gap-2 rounded-sm bg-[var(--color-amber)] hover:bg-[var(--color-amber-hover)] text-black px-6 py-3.5 text-[15px] font-medium transition"
             >
-              Reserve your cut
+              Try the V0 demo
               <span aria-hidden>→</span>
             </a>
             <a
-              href="#how"
+              href="#waitlist"
               className="inline-flex items-center gap-2 rounded-sm border border-[var(--color-border)] bg-white/[0.02] hover:bg-white/[0.06] text-[var(--color-ink-2)] px-6 py-3.5 text-[15px] transition"
             >
-              See the math
+              Waitlist for V1
             </a>
           </div>
+          <p className="mt-4 font-mono text-[11px] text-[var(--color-ink-quiet)] max-w-md leading-relaxed">
+            V0 proves Uber ride receipts, no dollar amounts yet. V1 ships the
+            first dollar-extracting blueprints in May.
+          </p>
 
           <div className="mt-12 flex items-center gap-6 font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--color-ink-quiet)]">
             <span>USA only</span>

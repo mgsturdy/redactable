@@ -97,22 +97,40 @@ function useGlitchIntensity() {
   return intensity;
 }
 
+/**
+ * Variant: "once" plays the first-load intro (black bar sweeps, retracts,
+ * reveals glitched letters permanently). "reactive" starts hidden under a
+ * black bar and only reveals when glitch intensity > 0 — used in the
+ * sticky nav, where the letters come and go with user motion.
+ */
+type Variant = "once" | "reactive";
+
 export function Logo({
   size = "md",
   className = "",
+  variant = "once",
 }: {
   size?: Size;
   className?: string;
+  variant?: Variant;
 }) {
   const glitch = useGlitchIntensity();
-  const [revealed, setRevealed] = useState(false);
+  // In reactive mode we want the glitch filter ready from the start so the
+  // letters look right the moment the bar retracts. In once mode the bar
+  // plays its intro animation first before the filter applies.
+  const [revealed, setRevealed] = useState(variant === "reactive");
   const filterRef = useRef<SVGFEDisplacementMapElement>(null);
 
-  // After the intro sweep completes, drop the bar and show the glitch text.
+  // "once" mode: after the intro sweep completes, drop the bar and show glitch text.
   useEffect(() => {
+    if (variant !== "once") return;
     const t = setTimeout(() => setRevealed(true), 1500);
     return () => clearTimeout(t);
-  }, []);
+  }, [variant]);
+
+  // "reactive" mode: the bar covers the letters whenever the page is at rest,
+  // and slides away the moment any motion kicks the glitch intensity above 0.
+  const reactiveCovered = variant === "reactive" && glitch <= 0.01;
 
   // Imperatively update the displacement scale — avoids React re-renders on every scroll frame.
   useEffect(() => {
@@ -177,13 +195,22 @@ export function Logo({
         R
         <span className="relative inline-block">
           edacta
-          {/* The black bar — stays over the letters during phase 1, then retracts */}
+          {/* The black bar. "once" mode plays the intro sweep + retract keyframes.
+              "reactive" mode uses a CSS transition on scaleX tied to glitch intensity. */}
           <span
             aria-hidden="true"
             className="absolute inset-y-[0.08em] -inset-x-[0.04em] bg-redact"
-            style={{
-              animation: `redact-sweep 1.2s var(--ease-out-expo) 0.3s both, redact-retract 0.5s var(--ease-out-expo) 1.5s forwards`,
-            }}
+            style={
+              variant === "reactive"
+                ? {
+                    transformOrigin: "right center",
+                    transform: `scaleX(${reactiveCovered ? 1 : 0})`,
+                    transition: "transform 280ms var(--ease-out-expo)",
+                  }
+                : {
+                    animation: `redact-sweep 1.2s var(--ease-out-expo) 0.3s both, redact-retract 0.5s var(--ease-out-expo) 1.5s forwards`,
+                  }
+            }
           />
         </span>
         ble

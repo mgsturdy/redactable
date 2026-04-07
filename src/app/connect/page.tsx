@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { NetworkPanel } from "@/components/NetworkPanel";
+import { ProofAnimation } from "@/components/ProofAnimation";
 import { requestGmailAccessToken } from "@/lib/google-auth";
 import { listMessages, fetchRawMessage, extractPreview } from "@/lib/gmail";
 import { proveEmail, type ProofResult } from "@/lib/prover";
@@ -152,7 +153,7 @@ export default function ConnectPage() {
               <PickerCard candidates={state.candidates} onPick={prove} />
             )}
             {state.phase === "proving" && (
-              <ProvingCard
+              <ProofAnimation
                 startedAt={state.startedAt}
                 subject={state.subject}
               />
@@ -275,45 +276,6 @@ function PickerCard({
           </li>
         ))}
       </ul>
-    </div>
-  );
-}
-
-function ProvingCard({
-  startedAt,
-  subject,
-}: {
-  startedAt: number;
-  subject: string;
-}) {
-  const [elapsed, setElapsed] = useState(0);
-  useEffect(() => {
-    const id = setInterval(() => setElapsed(Date.now() - startedAt), 250);
-    return () => clearInterval(id);
-  }, [startedAt]);
-
-  const seconds = Math.floor(elapsed / 1000);
-
-  return (
-    <div className="rounded-lg border border-[var(--color-amber)] bg-[var(--color-amber-muted)] p-8">
-      <div className="flex items-center gap-3 mb-4">
-        <span className="inline-block w-2 h-2 rounded-full bg-[var(--color-amber)] animate-pulse-dot" />
-        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--color-amber)]">
-          Step 03 · Proving locally
-        </span>
-      </div>
-      <div className="font-display text-[28px] text-[var(--color-ink)] mb-2 line-clamp-1">
-        {subject}
-      </div>
-      <div className="font-display text-[72px] text-[var(--color-amber)] tabular-nums leading-none my-6">
-        {seconds}s
-      </div>
-      <p className="text-[14px] text-[var(--color-ink-2)] leading-relaxed">
-        Your laptop is doing the math. 60–180 seconds is normal. The tab may
-        feel slow — that&apos;s intentional. Nothing is being sent to our
-        server during this step, which you can verify in the network panel
-        next to this card.
-      </p>
     </div>
   );
 }
