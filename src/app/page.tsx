@@ -1,6 +1,7 @@
 import { Logo } from "@/components/Logo";
 import { NetworkPanel } from "@/components/NetworkPanel";
 import { Estimator } from "@/components/Estimator";
+import { RedactLine } from "@/components/RedactLine";
 
 export default function Home() {
   return (
@@ -42,9 +43,9 @@ function Nav() {
           </a>
           <a
             href="https://github.com/mgsturdy/redactable"
-            className="font-mono text-[12px] uppercase tracking-widest hover:text-[var(--color-ink)] transition"
+            className="text-[var(--color-amber)] hover:text-[var(--color-amber-hover)] transition inline-flex items-center gap-1"
           >
-            Source
+            Source <span aria-hidden>↗</span>
           </a>
         </div>
         <a
@@ -197,7 +198,7 @@ function SeenVsNotSeen() {
                 stays in your browser · nobody sees this
               </span>
             </div>
-            <ul className="space-y-2 text-[var(--color-ink-2)]">
+            <ul className="space-y-3 text-[15px]">
               {[
                 "Your email address",
                 "Your name",
@@ -209,12 +210,9 @@ function SeenVsNotSeen() {
                 "Your password",
                 "Your other messages",
                 "Anything else Google has on you",
-              ].map((item) => (
-                <li key={item} className="flex items-center gap-3">
-                  <Redacted />
-                  <span className="line-through decoration-[var(--color-redact)] decoration-2">
-                    {item}
-                  </span>
+              ].map((item, i) => (
+                <li key={item}>
+                  <RedactLine delay={150 + i * 120}>{item}</RedactLine>
                 </li>
               ))}
             </ul>
@@ -272,15 +270,6 @@ function SeenVsNotSeen() {
         </p>
       </div>
     </section>
-  );
-}
-
-function Redacted() {
-  return (
-    <span
-      aria-hidden
-      className="inline-block w-4 h-2 bg-[var(--color-redact)] border border-[rgba(255,255,255,0.1)]"
-    />
   );
 }
 
@@ -410,7 +399,7 @@ function HowItWorks() {
     {
       n: "02",
       title: "Your laptop does the math.",
-      body: "A zero-knowledge prover runs in a Web Worker in your tab. Sixty to one hundred eighty seconds per receipt. Slower than remote proving. That's the whole point.",
+      body: "A zero-knowledge prover runs in a Web Worker in your tab, built on zk.email's open-source SDK — the same cryptography that powers zkP2P and Clave. Sixty to one hundred eighty seconds per receipt. Slower than remote proving. That's the whole point.",
     },
     {
       n: "03",
@@ -592,7 +581,19 @@ function Footer() {
         </div>
         <div className="mt-16 pt-8 border-t border-[var(--color-border-subtle)] flex flex-col md:flex-row items-start md:items-center justify-between gap-4 font-mono text-[11px] uppercase tracking-widest text-[var(--color-ink-quiet)]">
           <div>© 2026 Redactable · USA</div>
-          <div>The client is open source. Audit every byte.</div>
+          <div className="flex items-center gap-4">
+            <span>
+              Built on{" "}
+              <a
+                href="https://zk.email"
+                className="text-[var(--color-amber)] hover:text-[var(--color-amber-hover)] transition"
+              >
+                zk.email
+              </a>
+            </span>
+            <span aria-hidden>·</span>
+            <span>Open source. Audit every byte.</span>
+          </div>
         </div>
       </div>
     </footer>
