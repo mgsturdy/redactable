@@ -45,7 +45,10 @@ declare global {
   }
 }
 
-const CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!;
+// .trim() because env vars added via piped stdin (echo "..." | vercel env add)
+// can include a trailing newline that becomes %0A in the OAuth URL and breaks
+// client_id matching on Google's side. Defense in depth.
+const CLIENT_ID = (process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "").trim();
 const GMAIL_READONLY_SCOPE = "https://www.googleapis.com/auth/gmail.readonly";
 const GIS_SCRIPT_URL = "https://accounts.google.com/gsi/client";
 
