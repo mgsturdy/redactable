@@ -41,6 +41,15 @@ const securityHeaders = [
     key: "Permissions-Policy",
     value: "camera=(), microphone=(), geolocation=()",
   },
+  // Google Identity Services polls window.closed on the popup to detect
+  // when OAuth completes. Under a strict COOP (same-origin), that poll is
+  // blocked cross-origin and GIS immediately reports "popup_closed" even
+  // when the user successfully allowed access. same-origin-allow-popups
+  // keeps COOP isolation for most attack vectors but grants opener→popup
+  // visibility for windows this page opened itself, which is exactly what
+  // GIS needs. We deliberately do NOT set Cross-Origin-Embedder-Policy
+  // because require-corp would block the Google scripts entirely.
+  { key: "Cross-Origin-Opener-Policy", value: "same-origin-allow-popups" },
 ];
 
 // Defined separately so the config object stays declarative.
