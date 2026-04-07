@@ -43,22 +43,18 @@ export async function proveEmail(
   }
   console.log("[redactable/prover] blueprint loaded");
 
-  let valid = false;
+  // SDK signature is `validateEmail(eml: string): Promise<void>` — it throws on
+  // invalid email instead of returning a boolean. Catch and surface the reason.
   try {
-    valid = await blueprint.validateEmail(rawEml);
-    console.log("[redactable/prover] validateEmail:", valid);
+    await blueprint.validateEmail(rawEml);
+    console.log("[redactable/prover] validateEmail: passed");
   } catch (err) {
-    console.warn(
-      "[redactable/prover] validateEmail threw (continuing anyway):",
-      err
-    );
-  }
-  if (!valid) {
+    const detail = err instanceof Error ? err.message : String(err);
+    console.warn("[redactable/prover] validateEmail failed:", detail);
     throw new Error(
-      "This email doesn't match the blueprint's expected sender/format. " +
-        "The Uber receipt blueprint targets sptrans.uber.com (Portuguese rides). " +
-        "If your Uber receipts come from a different sender domain (uber.com, " +
-        "noreply@uber.us, etc.) you'll need a different blueprint."
+      `Email validation failed against blueprint ${blueprintSlug}. ` +
+        `This usually means the email's DKIM sender doesn't match what the ` +
+        `blueprint expects, or the body format has drifted. Underlying: ${detail}`
     );
   }
 
