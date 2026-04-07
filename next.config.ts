@@ -23,7 +23,11 @@ const csp = [
   "img-src 'self' data: blob: https://*.googleusercontent.com",
   // Strict: every outbound destination must be explicit. Raw email bytes can never
   // leave the browser to an unlisted host, because the browser blocks the fetch.
-  "connect-src 'self' https://accounts.google.com https://oauth2.googleapis.com https://gmail.googleapis.com https://www.googleapis.com https://content.googleapis.com https://conductor.zk.email https://archive.zk.email",
+  // storage.googleapis.com hosts the compiled zkey/wasm circuit artifacts
+  // for every blueprint — the prover downloads ~10 chunked zkey files from
+  // there during proof generation. Without it the worker fetches all fail
+  // silently and the prover hangs forever.
+  "connect-src 'self' https://accounts.google.com https://oauth2.googleapis.com https://gmail.googleapis.com https://www.googleapis.com https://content.googleapis.com https://conductor.zk.email https://archive.zk.email https://storage.googleapis.com",
   "frame-src 'self' https://accounts.google.com https://content.googleapis.com",
   "worker-src 'self' blob:",
   "object-src 'none'",

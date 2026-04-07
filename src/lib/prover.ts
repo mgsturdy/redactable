@@ -72,9 +72,29 @@ export async function proveEmail(
     "[redactable/prover] generating proof — this is the slow part",
     { externalInputs }
   );
+  // Hard timeout — the SDK runs the prover in a Web Worker and worker errors
+  // (e.g. CSP-blocked fetches) don't always propagate back to the main thread.
+  // Without this race the await would hang forever and the UI animation would
+  // never know to stop. 5 minutes is generous; real proofs are 1–3 min.
+  const PROVER_TIMEOUT_MS = 5 * 60 * 1000;
   let proof;
   try {
-    proof = await prover.generateProof(rawEml, externalInputs);
+    proof = await Promise.race([
+      prover.generateProof(rawEml, externalInputs),
+      new Promise((_, reject) =>
+        setTimeout(
+          () =>
+            reject(
+              new Error(
+                `Proof generation timed out after ${PROVER_TIMEOUT_MS / 1000}s. ` +
+                  `Check the browser console for CSP errors or worker failures — ` +
+                  `the prover sometimes hangs silently when its background fetches fail.`
+              )
+            ),
+          PROVER_TIMEOUT_MS
+        )
+      ),
+    ]);
   } catch (err) {
     console.error("[redactable/prover] generateProof failed:", err);
     const detail = err instanceof Error ? err.message : String(err);
