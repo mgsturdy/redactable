@@ -21,13 +21,20 @@ export type ProofResult = {
   durationMs: number;
 };
 
+export type ExternalInput = {
+  name: string;
+  value: string;
+  maxLength: number;
+};
+
 /**
  * Fetch a blueprint from conductor.zk.email, compile it in browser,
  * and generate a local proof against the given raw email string.
  */
 export async function proveEmail(
   blueprintSlug: string,
-  rawEml: string
+  rawEml: string,
+  externalInputs: ExternalInput[] = []
 ): Promise<ProofResult> {
   const start = Date.now();
 
@@ -61,10 +68,13 @@ export async function proveEmail(
   console.log("[redactable/prover] creating prover (isLocal: true)");
   const prover = blueprint.createProver({ isLocal: true });
 
-  console.log("[redactable/prover] generating proof — this is the slow part");
+  console.log(
+    "[redactable/prover] generating proof — this is the slow part",
+    { externalInputs }
+  );
   let proof;
   try {
-    proof = await prover.generateProof(rawEml);
+    proof = await prover.generateProof(rawEml, externalInputs);
   } catch (err) {
     console.error("[redactable/prover] generateProof failed:", err);
     const detail = err instanceof Error ? err.message : String(err);

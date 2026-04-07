@@ -17,6 +17,17 @@ import { proveEmail, type ProofResult } from "@/lib/prover";
 const BLUEPRINT_SLUG = "rutefig/UberReceipt@v11";
 const GMAIL_QUERY = "from:uber.com";
 
+// Blueprint requires a wallet_address external input — bound into the proof
+// for on-chain claim use cases. V0 uses the zero address as a placeholder; V1
+// would let the user paste their own or generate a session-scoped one.
+const EXTERNAL_INPUTS = [
+  {
+    name: "wallet_address",
+    value: "0x0000000000000000000000000000000000000000",
+    maxLength: 64,
+  },
+];
+
 type EmailCandidate = {
   id: string;
   rawEml: string;
@@ -109,7 +120,11 @@ export default function ConnectPage() {
         startedAt: Date.now(),
         subject: candidate.subject,
       });
-      const result = await proveEmail(BLUEPRINT_SLUG, candidate.rawEml);
+      const result = await proveEmail(
+        BLUEPRINT_SLUG,
+        candidate.rawEml,
+        EXTERNAL_INPUTS
+      );
 
       setState({ phase: "uploading" });
       const res = await fetch("/api/proofs", {
