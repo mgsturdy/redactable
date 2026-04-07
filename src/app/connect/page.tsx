@@ -10,24 +10,23 @@ import { manualGmailAuth } from "@/lib/google-auth-manual";
 import { listMessages, fetchRawMessage, extractPreview } from "@/lib/gmail";
 import { proveEmail, type ProofResult } from "@/lib/prover";
 
-// rutefig/UberReceipt@v11 is the correct blueprint for US Uber receipts.
-// US Uber emails arrive From: noreply@uber.com but are DKIM-signed by the
-// sptrans.uber.com subdomain, and the SDK matches blueprint sender_domain
-// against the DKIM d= tag (NOT the From: header) — so this blueprint with
-// sender_domain: sptrans.uber.com is the right one, not Bisht13's uber.com one.
-// Verified by reading the SDK source on day 1.
-const BLUEPRINT_SLUG = "rutefig/UberReceipt@v11";
-const GMAIL_QUERY = "from:uber.com";
+// wryonik/OrderTotal@v1 — "Grubhub Order Total". The ONLY production-ready
+// blueprint in the entire zk.email registry that extracts a dollar amount
+// from a real US food delivery merchant. Authored by a zk.email maintainer.
+// Status: client+server done. Has an on-chain verifier deployed on Base
+// Sepolia (0xCa7FCebee2c71cB9b014dF41Ae6Ba8dBD8d942c1).
+//
+// The body regex (<b>\$)([^<]+)< parses the literal "<b>$XX.XX</b>" tag in
+// Grubhub receipt emails. Uses sha_precompute_selector: "Total charge" so
+// the prover only hashes the body chunk after that string, making the
+// proof small and fast (email_body_max_length: 6144).
+//
+// No external inputs required.
+const BLUEPRINT_SLUG = "wryonik/OrderTotal@v1";
+const GMAIL_QUERY = 'from:eat.grubhub.com "thanks for your"';
 
-// Blueprint requires a wallet_address external input (max_length 64).
-// V0 uses the zero address as a placeholder; V1 will let users supply their own.
-const EXTERNAL_INPUTS: Array<{ name: string; value: string; maxLength: number }> = [
-  {
-    name: "wallet_address",
-    value: "0x0000000000000000000000000000000000000000",
-    maxLength: 64,
-  },
-];
+const EXTERNAL_INPUTS: Array<{ name: string; value: string; maxLength: number }> =
+  [];
 
 type EmailCandidate = {
   id: string;
@@ -177,7 +176,7 @@ export default function ConnectPage() {
         {/* Left: flow */}
         <div className="animate-fade-up">
           <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--color-amber)] mb-6">
-            V0 · Proof flow · Uber rides
+            V0 · Proof flow · Grubhub order totals
           </div>
           <h1 className="font-display text-[56px] sm:text-[72px] leading-[0.95] tracking-[-0.02em] text-[var(--color-ink)]">
             Prove one in
@@ -264,14 +263,14 @@ function IdleCard({
         Connect your Gmail.
       </div>
       <p className="text-[14px] text-[var(--color-ink-muted)] mb-6 leading-relaxed">
-        We&apos;ll request read-only access to your Gmail. The token lives
-        only in this tab. The only thing we&apos;re looking for is
+        We&apos;ll request read-only access to your Gmail. We&apos;re
+        searching for{" "}
         <span className="font-mono text-[var(--color-amber)]">
-          {" "}
-          from:uber.com
-        </span>{" "}
-        — your Uber ride receipts. You can confirm the scope in
-        Google&apos;s consent popup.
+          from:eat.grubhub.com &quot;thanks for your&quot;
+        </span>
+        {" "}— Grubhub order confirmation receipts. The proof will extract
+        the actual dollar total from the receipt body without revealing
+        anything else.
       </p>
       {hint && (
         <div className="mb-6 rounded-sm border border-[var(--color-amber)] bg-[var(--color-amber-muted)] px-4 py-3 text-[13px] text-[var(--color-ink-2)]">
