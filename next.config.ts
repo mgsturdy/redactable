@@ -23,7 +23,7 @@ const csp = [
   "img-src 'self' data: blob: https://*.googleusercontent.com",
   // Strict: every outbound destination must be explicit. Raw email bytes can never
   // leave the browser to an unlisted host, because the browser blocks the fetch.
-  "connect-src 'self' https://accounts.google.com https://oauth2.googleapis.com https://gmail.googleapis.com https://www.googleapis.com https://content.googleapis.com https://conductor.zk.email",
+  "connect-src 'self' https://accounts.google.com https://oauth2.googleapis.com https://gmail.googleapis.com https://www.googleapis.com https://content.googleapis.com https://conductor.zk.email https://archive.zk.email",
   "frame-src 'self' https://accounts.google.com https://content.googleapis.com",
   "worker-src 'self' blob:",
   "object-src 'none'",
