@@ -31,21 +31,53 @@ export async function proveEmail(
 ): Promise<ProofResult> {
   const start = Date.now();
 
-  const blueprint = await sdk.getBlueprint(blueprintSlug);
+  console.log("[redactable/prover] fetching blueprint:", blueprintSlug);
+  let blueprint;
+  try {
+    blueprint = await sdk.getBlueprint(blueprintSlug);
+  } catch (err) {
+    console.error("[redactable/prover] getBlueprint failed:", err);
+    throw new Error(
+      `Blueprint fetch failed: ${err instanceof Error ? err.message : String(err)}`
+    );
+  }
+  console.log("[redactable/prover] blueprint loaded");
+
+  let valid = false;
+  try {
+    valid = await blueprint.validateEmail(rawEml);
+    console.log("[redactable/prover] validateEmail:", valid);
+  } catch (err) {
+    console.warn(
+      "[redactable/prover] validateEmail threw (continuing anyway):",
+      err
+    );
+  }
+  if (!valid) {
+    throw new Error(
+      "This email doesn't match the blueprint's expected sender/format. " +
+        "The Uber receipt blueprint targets sptrans.uber.com (Portuguese rides). " +
+        "If your Uber receipts come from a different sender domain (uber.com, " +
+        "noreply@uber.us, etc.) you'll need a different blueprint."
+    );
+  }
+
+  console.log("[redactable/prover] creating prover (isLocal: true)");
   const prover = blueprint.createProver({ isLocal: true });
 
-  // SDK accepts the raw MIME string directly as first arg.
-  // No externalInputs for UberReceipt — it only extracts from the email.
-  const proof = await prover.generateProof(rawEml);
+  console.log("[redactable/prover] generating proof — this is the slow part");
+  let proof;
+  try {
+    proof = await prover.generateProof(rawEml);
+  } catch (err) {
+    console.error("[redactable/prover] generateProof failed:", err);
+    const detail = err instanceof Error ? err.message : String(err);
+    throw new Error(`Proof generation failed: ${detail}`);
+  }
+  console.log("[redactable/prover] proof generated successfully");
 
   const durationMs = Date.now() - start;
-
-  // The SDK's Proof object exposes a JSON-serializable form for publishing.
-  // Serialize via JSON.parse(JSON.stringify(...)) to strip class instances.
   const proofJson = JSON.parse(JSON.stringify(proof));
-
-  // Public extracted values from the blueprint's regex decomposition,
-  // if the SDK exposes them. Fall back to the whole proof if the shape is unknown.
   const publicData =
     (proof as { publicData?: Record<string, unknown> }).publicData ?? {};
 

@@ -126,10 +126,14 @@ export default function ConnectPage() {
       const upload = (await res.json()) as { id: string };
       setState({ phase: "done", result, receivedId: upload.id });
     } catch (err) {
-      setState({
-        phase: "error",
-        message: err instanceof Error ? err.message : "Proof failed",
-      });
+      console.error("[redactable/prove] failed:", err);
+      const message =
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+            ? err
+            : JSON.stringify(err);
+      setState({ phase: "error", message });
     }
   }
 
