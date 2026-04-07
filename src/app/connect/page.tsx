@@ -10,23 +10,32 @@ import { manualGmailAuth } from "@/lib/google-auth-manual";
 import { listMessages, fetchRawMessage, extractPreview } from "@/lib/gmail";
 import { proveEmail, type ProofResult } from "@/lib/prover";
 
-// minghui010430/github@v1 — the simplest universally-applicable blueprint
-// in the registry. Just extracts the From: header and validates the DKIM
-// signature. No specific subject required, no body parsing, no external
-// inputs. Works for ANY github.com email — security alerts, PR notifications,
-// commit emails, etc. Anyone with a GitHub account has dozens of these.
+// chandrabosep/retro_github@v3 — the only Circom GitHub blueprint in the
+// registry with email_header_max_length large enough (1792 bytes) for real
+// production GitHub emails. The smaller community blueprints all set 832
+// bytes which is roughly half what a real GitHub email header weighs.
 //
-// The proof attests: "this Gmail address has received DKIM-signed mail from
-// github.com" — i.e., "this person has a GitHub account connected to this
-// Gmail." A real consumer-owned credential — useful for dev community gating,
-// anti-sybil, contributor verification, hackathon participation, etc.
+// This one extracts the repo path from a GitHub notification email body
+// (looks for "url": "https://github.com/owner/repo" JSON block). Requires
+// the user's GitHub username as an external input — proof attests "this
+// Gmail received a github.com email about repo X owned/contributed by
+// username Y."
 //
-// Status 3, Circom, ignore_body_hash_check: true.
-const BLUEPRINT_SLUG = "minghui010430/github@v1";
-const GMAIL_QUERY = "from:github.com";
+// Compatible emails: push notifications, PR comments, issue activity. NOT
+// compatible: security alerts, billing, account-level emails (those don't
+// contain a repo URL in the body).
+const BLUEPRINT_SLUG = "chandrabosep/retro_github@v3";
+const GMAIL_QUERY = "from:notifications@github.com";
 
-const EXTERNAL_INPUTS: Array<{ name: string; value: string; maxLength: number }> =
-  [];
+// Required external input: GitHub username. This is mgsturdy because that's
+// the GitHub account that owns this repo and that Matt has been pushing from.
+const EXTERNAL_INPUTS: Array<{ name: string; value: string; maxLength: number }> = [
+  {
+    name: "username",
+    value: "mgsturdy",
+    maxLength: 128,
+  },
+];
 
 type EmailCandidate = {
   id: string;
@@ -176,7 +185,7 @@ export default function ConnectPage() {
         {/* Left: flow */}
         <div className="animate-fade-up">
           <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--color-amber)] mb-6">
-            V0 · Proof flow · GitHub account ownership
+            V0 · Proof flow · GitHub repo contributor
           </div>
           <h1 className="font-display text-[56px] sm:text-[72px] leading-[0.95] tracking-[-0.02em] text-[var(--color-ink)]">
             Prove one in
@@ -265,12 +274,12 @@ function IdleCard({
       <p className="text-[14px] text-[var(--color-ink-muted)] mb-6 leading-relaxed">
         We&apos;ll request read-only access to your Gmail and look for{" "}
         <span className="font-mono text-[var(--color-amber)]">
-          from:github.com
+          from:notifications@github.com
         </span>
-        . Pick any GitHub notification — a security alert, PR comment,
-        commit email, anything. The proof will attest you have a GitHub
-        account connected to this Gmail, cryptographically verified by
-        github.com&apos;s DKIM signature.
+        . Pick a GitHub notification about a repo (PR comment, push, or
+        issue). The proof will attest you received a github.com email
+        about a specific repo — useful for proving repo ownership or
+        contribution.
       </p>
       {hint && (
         <div className="mb-6 rounded-sm border border-[var(--color-amber)] bg-[var(--color-amber-muted)] px-4 py-3 text-[13px] text-[var(--color-ink-2)]">
