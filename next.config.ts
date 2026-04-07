@@ -52,8 +52,18 @@ const securityHeaders = [
   { key: "Cross-Origin-Opener-Policy", value: "same-origin-allow-popups" },
 ];
 
+// /oauth/callback gets a different COOP value (unsafe-none) so window.opener
+// survives the cross-origin navigation from accounts.google.com. Without this,
+// our callback page can't postMessage the access token back to the /connect tab.
+const callbackHeaders = securityHeaders.map((h) =>
+  h.key === "Cross-Origin-Opener-Policy"
+    ? { key: h.key, value: "unsafe-none" }
+    : h
+);
+
 // Defined separately so the config object stays declarative.
 const headerRoutes = async () => [
+  { source: "/oauth/callback", headers: callbackHeaders },
   { source: "/:path*", headers: securityHeaders },
 ];
 

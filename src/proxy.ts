@@ -10,12 +10,21 @@ import { NextResponse, type NextRequest } from "next/server";
  * Setting it here on every request guarantees the header reaches the
  * browser before the GIS popup tries to poll window.closed.
  */
-export function proxy(_request: NextRequest) {
+export function proxy(request: NextRequest) {
   const response = NextResponse.next();
-  response.headers.set(
-    "Cross-Origin-Opener-Policy",
-    "same-origin-allow-popups"
-  );
+  // The /oauth/callback page MUST keep window.opener alive so it can
+  // postMessage the access token back to the /connect tab that opened it.
+  // The default same-origin-allow-popups COOP severs window.opener when
+  // the popup navigates here from accounts.google.com — explicitly setting
+  // unsafe-none on this single route opts the page out of COOP isolation.
+  if (request.nextUrl.pathname === "/oauth/callback") {
+    response.headers.set("Cross-Origin-Opener-Policy", "unsafe-none");
+  } else {
+    response.headers.set(
+      "Cross-Origin-Opener-Policy",
+      "same-origin-allow-popups"
+    );
+  }
   return response;
 }
 
