@@ -10,20 +10,20 @@ import { manualGmailAuth } from "@/lib/google-auth-manual";
 import { listMessages, fetchRawMessage, extractPreview } from "@/lib/gmail";
 import { proveEmail, type ProofResult } from "@/lib/prover";
 
-// wryonik/OrderTotal@v1 — "Grubhub Order Total". The ONLY production-ready
-// blueprint in the entire zk.email registry that extracts a dollar amount
-// from a real US food delivery merchant. Authored by a zk.email maintainer.
-// Status: client+server done. Has an on-chain verifier deployed on Base
-// Sepolia (0xCa7FCebee2c71cB9b014dF41Ae6Ba8dBD8d942c1).
+// labsterx/X_Account@v1 — the absolute simplest reliable end-to-end proof
+// path in the entire zk.email registry. Header-only, no body parsing, no
+// external inputs, and the source email is reproducible on demand: trigger
+// a password reset on x.com and you'll get a DKIM-signed email with the
+// exact subject "Password reset request" the blueprint expects.
 //
-// The body regex (<b>\$)([^<]+)< parses the literal "<b>$XX.XX</b>" tag in
-// Grubhub receipt emails. Uses sha_precompute_selector: "Total charge" so
-// the prover only hashes the body chunk after that string, making the
-// proof small and fast (email_body_max_length: 6144).
+// The proof attests: "I have an X/Twitter account, cryptographically
+// verified by x.com's DKIM signature." This is a real consumer-owned KYC
+// credential — useful for anti-sybil, crypto airdrop allocations, dating
+// app verification, dev community gating, etc.
 //
-// No external inputs required.
-const BLUEPRINT_SLUG = "wryonik/OrderTotal@v1";
-const GMAIL_QUERY = 'from:eat.grubhub.com "thanks for your"';
+// Status 3, num_local_proofs > 0 (verified working), ignore_body_hash_check.
+const BLUEPRINT_SLUG = "labsterx/X_Account@v1";
+const GMAIL_QUERY = "from:x.com";
 
 const EXTERNAL_INPUTS: Array<{ name: string; value: string; maxLength: number }> =
   [];
@@ -176,7 +176,7 @@ export default function ConnectPage() {
         {/* Left: flow */}
         <div className="animate-fade-up">
           <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--color-amber)] mb-6">
-            V0 · Proof flow · Grubhub order totals
+            V0 · Proof flow · X account ownership
           </div>
           <h1 className="font-display text-[56px] sm:text-[72px] leading-[0.95] tracking-[-0.02em] text-[var(--color-ink)]">
             Prove one in
@@ -263,14 +263,14 @@ function IdleCard({
         Connect your Gmail.
       </div>
       <p className="text-[14px] text-[var(--color-ink-muted)] mb-6 leading-relaxed">
-        We&apos;ll request read-only access to your Gmail. We&apos;re
-        searching for{" "}
+        We&apos;ll request read-only access to your Gmail and look for{" "}
         <span className="font-mono text-[var(--color-amber)]">
-          from:eat.grubhub.com &quot;thanks for your&quot;
+          from:x.com
         </span>
-        {" "}— Grubhub order confirmation receipts. The proof will extract
-        the actual dollar total from the receipt body without revealing
-        anything else.
+        . Pick a password-reset email from X (you can trigger one in 30
+        seconds at x.com → Forgot password). The proof will attest that
+        you own that X account, cryptographically verified by x.com&apos;s
+        DKIM signature.
       </p>
       {hint && (
         <div className="mb-6 rounded-sm border border-[var(--color-amber)] bg-[var(--color-amber-muted)] px-4 py-3 text-[13px] text-[var(--color-ink-2)]">
