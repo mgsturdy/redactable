@@ -1,14 +1,15 @@
 /**
  * Google Identity Services wrapper — pure client-side OAuth.
  *
- * Lazy-loads the GIS script from accounts.google.com, creates a token
- * client, and returns a raw access token to the caller. The token lives
- * only in the caller's closure — never stored in localStorage, never
- * sent to our server, never serialized.
+ * CRITICAL: GIS popup must be opened in the same synchronous task as
+ * the user's click. If you `await` anything between the click handler
+ * and `client.requestAccessToken()`, the user-activation token is
+ * consumed and the popup gets blocked or closed instantly. The fix is
+ * to PRELOAD the GIS script and the token client at page mount, then
+ * call `requestAccessToken()` synchronously when the user clicks.
  *
- * This is the implicit/token flow: no redirect, no backend session,
- * no cookies. Google issues the token directly to the browser via
- * postMessage from the popup.
+ * Token lives only in the caller's closure — never stored in
+ * localStorage, never sent to our server, never serialized.
  */
 
 type GoogleTokenResponse = {
@@ -48,9 +49,21 @@ const CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!;
 const GMAIL_READONLY_SCOPE = "https://www.googleapis.com/auth/gmail.readonly";
 const GIS_SCRIPT_URL = "https://accounts.google.com/gsi/client";
 
-let gisLoadPromise: Promise<void> | null = null;
+export class OAuthDismissedError extends Error {
+  constructor(message = "You closed the Google sign-in window.") {
+    super(message);
+    this.name = "OAuthDismissedError";
+  }
+}
 
-function loadGis(): Promise<void> {
+let gisLoadPromise: Promise<void> | null = null;
+let tokenClient: TokenClient | null = null;
+let pendingResolvers: {
+  resolve: (token: string) => void;
+  reject: (err: Error) => void;
+} | null = null;
+
+function loadGisScript(): Promise<void> {
   if (typeof window === "undefined") {
     return Promise.reject(new Error("GIS cannot load server-side"));
   }
@@ -84,72 +97,86 @@ function loadGis(): Promise<void> {
 }
 
 /**
- * Distinct error class so the UI can handle user-dismissed popups
- * gracefully instead of treating them as a crash.
+ * Preload GIS at page mount so the click handler can call
+ * requestAccessToken() synchronously, preserving user activation.
+ * Safe to call multiple times — it's idempotent.
  */
-export class OAuthDismissedError extends Error {
-  constructor(message = "You closed the Google sign-in window.") {
-    super(message);
-    this.name = "OAuthDismissedError";
-  }
-}
-
-/**
- * Prompt the user to authorize Gmail read access and return the access token.
- * Token is only valid for ~1 hour. We request it fresh every session.
- */
-export async function requestGmailAccessToken(): Promise<string> {
+export async function preloadGoogleAuth(): Promise<void> {
   if (!CLIENT_ID) {
     throw new Error(
       "NEXT_PUBLIC_GOOGLE_CLIENT_ID is not set. Check .env.local."
     );
   }
-  await loadGis();
+  await loadGisScript();
+  if (tokenClient) return;
 
-  return new Promise((resolve, reject) => {
-    const client = window.google!.accounts.oauth2.initTokenClient({
-      client_id: CLIENT_ID,
-      scope: GMAIL_READONLY_SCOPE,
-      callback: (response) => {
-        if (response.error) {
-          reject(
-            new Error(
-              response.error_description ||
-                response.error ||
-                "OAuth failed"
-            )
-          );
-          return;
-        }
-        if (!response.access_token) {
-          reject(new Error("No access token returned"));
-          return;
-        }
-        resolve(response.access_token);
-      },
-      error_callback: (err) => {
-        // GIS fires this for popup_closed, popup_failed_to_open, user_cancel, etc.
-        // All of those are user-dismissal, not crashes.
+  tokenClient = window.google!.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID,
+    scope: GMAIL_READONLY_SCOPE,
+    callback: (response) => {
+      const r = pendingResolvers;
+      pendingResolvers = null;
+      if (!r) return;
+      if (response.error) {
+        r.reject(
+          new Error(
+            response.error_description || response.error || "OAuth failed"
+          )
+        );
+        return;
+      }
+      if (!response.access_token) {
+        r.reject(new Error("No access token returned"));
+        return;
+      }
+      r.resolve(response.access_token);
+    },
+    error_callback: (err) => {
+      // Defer the rejection by a tick — if a successful callback is racing
+      // to deliver via postMessage, it should win.
+      setTimeout(() => {
+        const r = pendingResolvers;
+        if (!r) return; // success already handled it
+        pendingResolvers = null;
         const type = err.type ?? "";
         if (
           type === "popup_closed" ||
           type === "popup_failed_to_open" ||
           type === "user_cancel"
         ) {
-          reject(new OAuthDismissedError());
+          r.reject(new OAuthDismissedError());
           return;
         }
-        reject(new Error(err.message ?? `OAuth error: ${type || "unknown"}`));
-      },
-    });
-    // Don't force re-consent every call — let GIS use cached consent if available.
-    client.requestAccessToken();
+        r.reject(new Error(err.message ?? `OAuth error: ${type || "unknown"}`));
+      }, 600);
+    },
   });
 }
 
 /**
- * Revoke the access token. Best-effort — we don't wait for confirmation.
+ * Trigger the OAuth popup. MUST be called synchronously inside a user
+ * gesture handler (a click). Returns a promise that resolves with the
+ * access token when the user completes the consent flow.
  */
+export function requestGmailAccessToken(): Promise<string> {
+  if (!tokenClient) {
+    return Promise.reject(
+      new Error(
+        "Google auth not preloaded — call preloadGoogleAuth() before this."
+      )
+    );
+  }
+  return new Promise<string>((resolve, reject) => {
+    if (pendingResolvers) {
+      // A previous attempt is still in flight — replace it
+      pendingResolvers.reject(new OAuthDismissedError());
+    }
+    pendingResolvers = { resolve, reject };
+    // SYNCHRONOUS call inside the click handler — preserves user activation
+    tokenClient!.requestAccessToken();
+  });
+}
+
 export function revokeAccessToken(token: string): Promise<void> {
   return new Promise((resolve) => {
     if (!window.google?.accounts?.oauth2) {

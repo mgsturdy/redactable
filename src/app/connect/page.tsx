@@ -5,7 +5,11 @@ import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { NetworkPanel } from "@/components/NetworkPanel";
 import { ProofAnimation } from "@/components/ProofAnimation";
-import { requestGmailAccessToken, OAuthDismissedError } from "@/lib/google-auth";
+import {
+  preloadGoogleAuth,
+  requestGmailAccessToken,
+  OAuthDismissedError,
+} from "@/lib/google-auth";
 import { listMessages, fetchRawMessage, extractPreview } from "@/lib/gmail";
 import { proveEmail, type ProofResult } from "@/lib/prover";
 
@@ -33,12 +37,33 @@ type ConnectState =
 export default function ConnectPage() {
   const [state, setState] = useState<ConnectState>({ phase: "idle" });
 
+  // Preload GIS at page mount so the click handler can call requestAccessToken()
+  // synchronously without consuming the user-activation token via async awaits.
+  useEffect(() => {
+    preloadGoogleAuth().catch((err) => {
+      console.warn("[redactable] GIS preload failed:", err);
+    });
+  }, []);
+
   async function startFlow() {
+    // Kick off the popup synchronously inside the click handler so the user
+    // gesture is still alive. Then await the result.
+    let tokenPromise: Promise<string>;
     try {
-      setState({ phase: "auth" });
+      tokenPromise = requestGmailAccessToken();
+    } catch (err) {
+      setState({
+        phase: "error",
+        message: err instanceof Error ? err.message : "Failed to start auth",
+      });
+      return;
+    }
+    setState({ phase: "auth" });
+
+    try {
       let token: string;
       try {
-        token = await requestGmailAccessToken();
+        token = await tokenPromise;
       } catch (err) {
         if (err instanceof OAuthDismissedError) {
           setState({
