@@ -15,12 +15,16 @@ import type { NextConfig } from "next";
  */
 const csp = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'",
-  "style-src 'self' 'unsafe-inline'",
+  // Google Identity Services script + zk.email prover WASM + inline React hydration.
+  "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://accounts.google.com https://apis.google.com",
+  "script-src-elem 'self' 'unsafe-inline' https://accounts.google.com https://apis.google.com",
+  "style-src 'self' 'unsafe-inline' https://accounts.google.com",
   "font-src 'self' data:",
-  "img-src 'self' data: blob:",
-  "connect-src 'self' https://accounts.google.com https://oauth2.googleapis.com https://gmail.googleapis.com https://www.googleapis.com https://conductor.zk.email",
-  "frame-src 'self' https://accounts.google.com",
+  "img-src 'self' data: blob: https://*.googleusercontent.com",
+  // Strict: every outbound destination must be explicit. Raw email bytes can never
+  // leave the browser to an unlisted host, because the browser blocks the fetch.
+  "connect-src 'self' https://accounts.google.com https://oauth2.googleapis.com https://gmail.googleapis.com https://www.googleapis.com https://content.googleapis.com https://conductor.zk.email",
+  "frame-src 'self' https://accounts.google.com https://content.googleapis.com",
   "worker-src 'self' blob:",
   "object-src 'none'",
   "base-uri 'self'",
