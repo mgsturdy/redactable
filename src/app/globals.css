@@ -2,48 +2,48 @@
 
 /* ============================================================
    Redactable — Design tokens
-   Base: Linear (near-black canvas, Inter Variable, weight 510)
-   Twist: redaction-bar black motif + amber accent
+   Display: Instrument Serif (editorial, Mickle-esque)
+   Body:    DM Sans (modern geometric)
+   Mono:    IBM Plex Mono (technical, rectangular)
    ============================================================ */
 
 @theme {
-  /* Surface — Linear luminance stack */
-  --color-canvas: #08090a;       /* marketing black */
-  --color-panel:  #0f1011;       /* panel dark */
-  --color-surface: #191a1b;      /* elevated surface */
-  --color-surface-2: #28282c;    /* hover / raised */
+  /* Surface — Linear-inspired luminance stack */
+  --color-canvas: #08090a;
+  --color-panel:  #0f1011;
+  --color-surface: #191a1b;
+  --color-surface-2: #28282c;
 
   /* Text */
-  --color-ink:        #f7f8f8;   /* primary */
-  --color-ink-2:      #d0d6e0;   /* secondary */
-  --color-ink-muted:  #8a8f98;   /* muted */
-  --color-ink-quiet:  #62666d;   /* disabled / timestamps */
+  --color-ink:        #f7f8f8;
+  --color-ink-2:      #d0d6e0;
+  --color-ink-muted:  #8a8f98;
+  --color-ink-quiet:  #62666d;
 
   /* Borders */
   --color-border:         rgba(255, 255, 255, 0.08);
   --color-border-subtle:  rgba(255, 255, 255, 0.05);
 
-  /* Redaction + accent — our identity */
-  --color-redact: #000000;       /* pure black bar */
-  --color-amber:   #f5a623;      /* primary accent */
+  /* Brand — redaction black + amber accent */
+  --color-redact: #000000;
+  --color-amber: #f5a623;
   --color-amber-hover: #ffb84d;
   --color-amber-muted: rgba(245, 166, 35, 0.12);
-
-  /* Status */
   --color-ok: #10b981;
+  --color-danger: #f87171;
 
   /* Type */
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-mono: var(--font-jetbrains), ui-monospace, "SF Mono", Menlo, monospace;
+  --font-display-stack: var(--font-display), ui-serif, Georgia, "Times New Roman", serif;
+  --font-grit-stack: var(--font-grit), var(--font-display), ui-serif, serif;
+  --font-sans-stack: var(--font-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono-stack: var(--font-mono), ui-monospace, "SF Mono", Menlo, monospace;
 
   /* Motion */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out-quint: cubic-bezier(0.83, 0, 0.17, 1);
 }
 
-/* Inter Variable OpenType — Linear's signature look */
 html {
-  font-feature-settings: "cv01", "ss03";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -52,7 +52,7 @@ html {
 body {
   background: var(--color-canvas);
   color: var(--color-ink);
-  font-family: var(--font-sans);
+  font-family: var(--font-sans-stack);
   font-weight: 400;
   min-height: 100dvh;
 }
@@ -62,60 +62,77 @@ body {
   color: #000;
 }
 
+/* Utility classes — explicit stacks */
+.font-display { font-family: var(--font-display-stack); }
+.font-grit    { font-family: var(--font-grit-stack); }
+.font-sans    { font-family: var(--font-sans-stack); }
+.font-mono    { font-family: var(--font-mono-stack); font-feature-settings: "tnum"; }
+
 /* ============================================================
-   Redaction-bar logo reveal
-   A black bar sweeps across "edacta" on mount and stays
+   Logo animation — phase 1 sweep, phase 2 retract
    ============================================================ */
 @keyframes redact-sweep {
-  0% {
-    transform: scaleX(0);
-    transform-origin: left center;
-  }
-  60% {
-    transform: scaleX(1);
-    transform-origin: left center;
-  }
-  60.01% {
-    transform-origin: right center;
-  }
-  100% {
-    transform: scaleX(1);
-    transform-origin: right center;
-  }
+  0%   { transform: scaleX(0); transform-origin: left center; }
+  60%  { transform: scaleX(1); transform-origin: left center; }
+  60.01% { transform-origin: right center; }
+  100% { transform: scaleX(1); transform-origin: right center; }
+}
+
+@keyframes redact-retract {
+  0%   { transform: scaleX(1); transform-origin: right center; }
+  100% { transform: scaleX(0); transform-origin: right center; }
 }
 
 @keyframes fade-up {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes pulse-dot {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 1; }
+  0%, 100% { opacity: 0.35; }
+  50%      { opacity: 1; }
 }
 
-.animate-fade-up {
-  animation: fade-up 0.8s var(--ease-out-expo) both;
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
 }
 
-.animate-pulse-dot {
-  animation: pulse-dot 2s ease-in-out infinite;
-}
+.animate-fade-up   { animation: fade-up 0.9s var(--ease-out-expo) both; }
+.animate-pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
+.animate-marquee   { animation: marquee 40s linear infinite; }
 
-/* Noise grain overlay — subtle, for that "serious tool" texture */
+/* Subtle SVG noise grain — "serious tool" texture */
 .grain::before {
   content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 100;
-  opacity: 0.025;
+  opacity: 0.03;
   mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Input range styling for estimator */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  width: 100%;
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 2px;
+  background: rgba(255,255,255,0.12);
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background: var(--color-amber);
+  margin-top: -7px;
+  cursor: grab;
+  box-shadow: 0 0 0 4px rgba(245, 166, 35, 0.15);
 }
