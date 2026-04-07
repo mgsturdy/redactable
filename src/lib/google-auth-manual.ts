@@ -79,14 +79,16 @@ export function manualGmailAuth(): Promise<string> {
   const features = "popup=yes,width=500,height=620,left=200,top=100";
 
   // SYNCHRONOUS popup open inside the click handler
-  const popup = window.open(url, "redactable_oauth", features);
-  if (!popup) {
+  const opened = window.open(url, "redactable_oauth", features);
+  if (!opened) {
     return Promise.reject(
       new OAuthDismissedError(
         "Browser blocked the popup. Allow popups for this site and try again."
       )
     );
   }
+  // Now-narrowed const that TypeScript will track inside closures
+  const popup: Window = opened;
 
   return new Promise<string>((resolve, reject) => {
     let settled = false;
@@ -102,7 +104,10 @@ export function manualGmailAuth(): Promise<string> {
         console.log("[redactable/manual-auth] received token via postMessage");
         resolve(event.data.accessToken);
       } else {
-        console.warn("[redactable/manual-auth] callback reported error:", event.data.error);
+        console.warn(
+          "[redactable/manual-auth] callback reported error:",
+          event.data.error
+        );
         reject(new Error(event.data.error));
       }
     };
@@ -110,7 +115,14 @@ export function manualGmailAuth(): Promise<string> {
     // Detect manual popup close (user X-ing out before completing)
     const closedPoll = setInterval(() => {
       if (settled) return;
-      if (popup.closed) {
+      let isClosed = false;
+      try {
+        isClosed = popup.closed;
+      } catch {
+        // COOP can throw on closed access in some browsers — treat as still open
+        return;
+      }
+      if (isClosed) {
         cleanup();
         reject(new OAuthDismissedError());
       }
@@ -139,6 +151,8 @@ export function manualGmailAuth(): Promise<string> {
     }
 
     window.addEventListener("message", onMessage);
-    console.log("[redactable/manual-auth] popup opened, waiting for postMessage");
+    console.log(
+      "[redactable/manual-auth] popup opened, waiting for postMessage"
+    );
   });
 }
