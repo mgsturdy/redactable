@@ -102,21 +102,35 @@ function loadGisScript(): Promise<void> {
  * Safe to call multiple times — it's idempotent.
  */
 export async function preloadGoogleAuth(): Promise<void> {
+  console.log("[redactable/auth] preloadGoogleAuth called");
   if (!CLIENT_ID) {
     throw new Error(
       "NEXT_PUBLIC_GOOGLE_CLIENT_ID is not set. Check .env.local."
     );
   }
+  console.log("[redactable/auth] CLIENT_ID present:", CLIENT_ID.slice(0, 18) + "...");
   await loadGisScript();
-  if (tokenClient) return;
+  console.log("[redactable/auth] GIS script loaded");
+  if (tokenClient) {
+    console.log("[redactable/auth] tokenClient already initialized");
+    return;
+  }
 
   tokenClient = window.google!.accounts.oauth2.initTokenClient({
     client_id: CLIENT_ID,
     scope: GMAIL_READONLY_SCOPE,
     callback: (response) => {
+      console.log("[redactable/auth] callback fired", {
+        hasToken: !!response.access_token,
+        error: response.error,
+        scope: response.scope,
+      });
       const r = pendingResolvers;
       pendingResolvers = null;
-      if (!r) return;
+      if (!r) {
+        console.warn("[redactable/auth] callback fired but no pendingResolvers");
+        return;
+      }
       if (response.error) {
         r.reject(
           new Error(
@@ -129,14 +143,19 @@ export async function preloadGoogleAuth(): Promise<void> {
         r.reject(new Error("No access token returned"));
         return;
       }
+      console.log("[redactable/auth] resolving with token");
       r.resolve(response.access_token);
     },
     error_callback: (err) => {
+      console.warn("[redactable/auth] error_callback fired", err);
       // Defer the rejection by a tick — if a successful callback is racing
       // to deliver via postMessage, it should win.
       setTimeout(() => {
         const r = pendingResolvers;
-        if (!r) return; // success already handled it
+        if (!r) {
+          console.log("[redactable/auth] success already handled, ignoring error_callback");
+          return;
+        }
         pendingResolvers = null;
         const type = err.type ?? "";
         if (
@@ -151,6 +170,7 @@ export async function preloadGoogleAuth(): Promise<void> {
       }, 600);
     },
   });
+  console.log("[redactable/auth] tokenClient initialized, ready for click");
 }
 
 /**
@@ -159,6 +179,12 @@ export async function preloadGoogleAuth(): Promise<void> {
  * access token when the user completes the consent flow.
  */
 export function requestGmailAccessToken(): Promise<string> {
+  console.log("[redactable/auth] requestGmailAccessToken called", {
+    tokenClientReady: !!tokenClient,
+    hasUserActivation: typeof navigator !== "undefined" && "userActivation" in navigator
+      ? (navigator as Navigator & { userActivation?: { isActive: boolean } }).userActivation?.isActive
+      : "unknown",
+  });
   if (!tokenClient) {
     return Promise.reject(
       new Error(
@@ -168,12 +194,14 @@ export function requestGmailAccessToken(): Promise<string> {
   }
   return new Promise<string>((resolve, reject) => {
     if (pendingResolvers) {
-      // A previous attempt is still in flight — replace it
+      console.warn("[redactable/auth] replacing in-flight resolvers");
       pendingResolvers.reject(new OAuthDismissedError());
     }
     pendingResolvers = { resolve, reject };
+    console.log("[redactable/auth] calling tokenClient.requestAccessToken() synchronously");
     // SYNCHRONOUS call inside the click handler — preserves user activation
     tokenClient!.requestAccessToken();
+    console.log("[redactable/auth] requestAccessToken returned");
   });
 }
 
