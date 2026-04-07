@@ -10,20 +10,20 @@ import { manualGmailAuth } from "@/lib/google-auth-manual";
 import { listMessages, fetchRawMessage, extractPreview } from "@/lib/gmail";
 import { proveEmail, type ProofResult } from "@/lib/prover";
 
-// labsterx/X_Account@v1 — the absolute simplest reliable end-to-end proof
-// path in the entire zk.email registry. Header-only, no body parsing, no
-// external inputs, and the source email is reproducible on demand: trigger
-// a password reset on x.com and you'll get a DKIM-signed email with the
-// exact subject "Password reset request" the blueprint expects.
+// minghui010430/github@v1 — the simplest universally-applicable blueprint
+// in the registry. Just extracts the From: header and validates the DKIM
+// signature. No specific subject required, no body parsing, no external
+// inputs. Works for ANY github.com email — security alerts, PR notifications,
+// commit emails, etc. Anyone with a GitHub account has dozens of these.
 //
-// The proof attests: "I have an X/Twitter account, cryptographically
-// verified by x.com's DKIM signature." This is a real consumer-owned KYC
-// credential — useful for anti-sybil, crypto airdrop allocations, dating
-// app verification, dev community gating, etc.
+// The proof attests: "this Gmail address has received DKIM-signed mail from
+// github.com" — i.e., "this person has a GitHub account connected to this
+// Gmail." A real consumer-owned credential — useful for dev community gating,
+// anti-sybil, contributor verification, hackathon participation, etc.
 //
-// Status 3, num_local_proofs > 0 (verified working), ignore_body_hash_check.
-const BLUEPRINT_SLUG = "labsterx/X_Account@v1";
-const GMAIL_QUERY = "from:x.com";
+// Status 3, Circom, ignore_body_hash_check: true.
+const BLUEPRINT_SLUG = "minghui010430/github@v1";
+const GMAIL_QUERY = "from:github.com";
 
 const EXTERNAL_INPUTS: Array<{ name: string; value: string; maxLength: number }> =
   [];
@@ -176,7 +176,7 @@ export default function ConnectPage() {
         {/* Left: flow */}
         <div className="animate-fade-up">
           <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--color-amber)] mb-6">
-            V0 · Proof flow · X account ownership
+            V0 · Proof flow · GitHub account ownership
           </div>
           <h1 className="font-display text-[56px] sm:text-[72px] leading-[0.95] tracking-[-0.02em] text-[var(--color-ink)]">
             Prove one in
@@ -265,12 +265,12 @@ function IdleCard({
       <p className="text-[14px] text-[var(--color-ink-muted)] mb-6 leading-relaxed">
         We&apos;ll request read-only access to your Gmail and look for{" "}
         <span className="font-mono text-[var(--color-amber)]">
-          from:x.com
+          from:github.com
         </span>
-        . Pick a password-reset email from X (you can trigger one in 30
-        seconds at x.com → Forgot password). The proof will attest that
-        you own that X account, cryptographically verified by x.com&apos;s
-        DKIM signature.
+        . Pick any GitHub notification — a security alert, PR comment,
+        commit email, anything. The proof will attest you have a GitHub
+        account connected to this Gmail, cryptographically verified by
+        github.com&apos;s DKIM signature.
       </p>
       {hint && (
         <div className="mb-6 rounded-sm border border-[var(--color-amber)] bg-[var(--color-amber-muted)] px-4 py-3 text-[13px] text-[var(--color-ink-2)]">
