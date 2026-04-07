@@ -7,7 +7,6 @@ export default function Home() {
     <main className="flex-1 flex flex-col">
       <Nav />
       <Hero />
-      <Ticker />
       <Thesis />
       <SeenVsNotSeen />
       <WhoPays />
@@ -70,7 +69,7 @@ function Hero() {
         <div className="animate-fade-up">
           <div className="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--color-amber)] mb-10">
             <span className="inline-block w-1 h-1 rounded-full bg-[var(--color-amber)] animate-pulse-dot" />
-            V0 live · Today your Uber rides · Soon your whole wallet
+            V0 Beta · Live May 2026
           </div>
 
           <h1 className="font-display text-[64px] sm:text-[88px] md:text-[112px] leading-[0.9] tracking-[-0.02em] text-[var(--color-ink)]">
@@ -123,36 +122,6 @@ function Hero() {
             until a finished proof ships. The browser enforces it.
           </p>
         </div>
-      </div>
-    </section>
-  );
-}
-
-/* ============================================================
-   MARQUEE TICKER — running statements
-   ============================================================ */
-function Ticker() {
-  const lines = [
-    "You're not the product anymore",
-    "Proof, not promises",
-    "Math, not trust",
-    "We architecturally cannot see a thing",
-    "Your data has been a fire sale since 2009",
-    "This is the patch",
-  ];
-  const doubled = [...lines, ...lines];
-
-  return (
-    <section className="border-y border-[var(--color-border-subtle)] bg-[var(--color-panel)] overflow-hidden py-8">
-      <div className="flex animate-marquee whitespace-nowrap gap-12 font-display text-[40px] italic text-[var(--color-ink-quiet)]">
-        {doubled.map((line, i) => (
-          <span key={i} className="flex items-center gap-12">
-            {line}
-            <span className="text-[var(--color-amber)] not-italic font-mono text-[14px]">
-              ▇▇
-            </span>
-          </span>
-        ))}
       </div>
     </section>
   );
@@ -231,15 +200,15 @@ function SeenVsNotSeen() {
             <ul className="space-y-2 text-[var(--color-ink-2)]">
               {[
                 "Your email address",
-                "Your password",
-                "The people you email",
-                "The content of your receipts",
-                "Merchant names, item lists, quantities",
+                "Your name",
                 "Your home address",
                 "Your phone number",
                 "Your credit card digits",
-                "Your browsing history",
-                "Anything Google knows about you",
+                "Item-level detail (what exactly you ordered)",
+                "The people you email",
+                "Your password",
+                "Your other messages",
+                "Anything else Google has on you",
               ].map((item) => (
                 <li key={item} className="flex items-center gap-3">
                   <Redacted />
@@ -251,43 +220,40 @@ function SeenVsNotSeen() {
             </ul>
           </div>
 
-          {/* Ships in the proof */}
+          {/* Ships in the proof — the valuable payload */}
           <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-canvas)] p-8">
             <div className="flex items-center gap-3 mb-6">
               <span className="inline-block w-2 h-2 rounded-full bg-[var(--color-ok)]" />
               <span className="font-mono text-[11px] uppercase tracking-widest text-[var(--color-ink-quiet)]">
-                ships in the proof · buyers see this
+                ships in the proof · the valuable part
               </span>
             </div>
-            <ul className="space-y-3 font-mono text-[13px] text-[var(--color-ink-2)]">
-              <li>
-                <span className="text-[var(--color-amber)]">sender_domain</span>{" "}
-                <span className="text-[var(--color-ink-quiet)]">=</span>{" "}
-                &quot;uber.com&quot;
-              </li>
-              <li>
-                <span className="text-[var(--color-amber)]">timestamp</span>{" "}
-                <span className="text-[var(--color-ink-quiet)]">=</span>{" "}
-                2026-04-03T14:22:00Z
-              </li>
-              <li>
-                <span className="text-[var(--color-amber)]">dkim_valid</span>{" "}
-                <span className="text-[var(--color-ink-quiet)]">=</span> true
-              </li>
-              <li>
-                <span className="text-[var(--color-amber)]">anon_id</span>{" "}
-                <span className="text-[var(--color-ink-quiet)]">=</span>{" "}
-                poseidon(email || salt)
-              </li>
-              <li>
-                <span className="text-[var(--color-amber)]">zk_proof</span>{" "}
-                <span className="text-[var(--color-ink-quiet)]">=</span>{" "}
-                0x7f3a...c91b
-              </li>
-              <li className="pt-3 text-[var(--color-ink-quiet)] not-italic">
-                // that&apos;s the entire payload
-              </li>
-            </ul>
+            <pre className="font-mono text-[12px] leading-relaxed text-[var(--color-ink-2)] overflow-x-auto">
+{`{
+  `}<span className="text-[var(--color-amber)]">merchant</span>{`:        "DoorDash",
+  `}<span className="text-[var(--color-amber)]">merchant_domain</span>{`: "doordash.com",
+  `}<span className="text-[var(--color-amber)]">category</span>{`:        "food_delivery",
+  `}<span className="text-[var(--color-amber)]">amount_cents</span>{`:    3420,
+  `}<span className="text-[var(--color-amber)]">currency</span>{`:        "USD",
+  `}<span className="text-[var(--color-amber)]">tip_cents</span>{`:       520,
+  `}<span className="text-[var(--color-amber)]">timestamp</span>{`:       "2026-04-03T14:22:00Z",
+  `}<span className="text-[var(--color-amber)]">metro</span>{`:           "US-NY-NYC",
+  `}<span className="text-[var(--color-amber)]">payment_method</span>{`:  "card",
+  `}<span className="text-[var(--color-amber)]">is_first_order</span>{`:  false,
+  `}<span className="text-[var(--color-amber)]">dkim_valid</span>{`:      true,
+  `}<span className="text-[var(--color-amber)]">anon_user_id</span>{`:    "p_8f2a...c91b",
+  `}<span className="text-[var(--color-amber)]">proof</span>{`:           "0x7f3a...c91b"
+}`}
+            </pre>
+            <div className="mt-6 pt-6 border-t border-[var(--color-border-subtle)] text-[12px] text-[var(--color-ink-muted)] leading-relaxed">
+              The merchant, amount, category, metro, and timestamp are the
+              signal funds pay for.{" "}
+              <span className="text-[var(--color-ink-2)]">
+                None of this can be traced back to you
+              </span>
+              . The anon_user_id is a one-way poseidon hash — stable across
+              your own receipts so a panel works, unreversible to your email.
+            </div>
           </div>
         </div>
 
