@@ -77,7 +77,7 @@ export default function ConnectPage() {
       }
 
       setState({ phase: "fetching", step: "Searching your inbox..." });
-      const messages = await listMessages(token, GMAIL_QUERY, 5);
+      const messages = await listMessages(token, GMAIL_QUERY, 20);
       if (messages.length === 0) {
         setState({
           phase: "error",
