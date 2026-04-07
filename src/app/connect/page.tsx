@@ -10,12 +10,12 @@ import { manualGmailAuth } from "@/lib/google-auth-manual";
 import { listMessages, fetchRawMessage, extractPreview } from "@/lib/gmail";
 import { proveEmail, type ProofResult } from "@/lib/prover";
 
-// saugardev/ProofStripePayment extracts merchant + order_id from any
-// Stripe-powered receipt email (Substack, ChatGPT Plus, Notion, Figma,
-// thousands of SaaS subscriptions). Plain-text-friendly, stable template,
-// status 3 (production). Most US users have several of these in their inbox.
-const BLUEPRINT_SLUG = "saugardev/ProofStripePayment@v1";
-const GMAIL_QUERY = "from:stripe.com";
+// rutefig/UberReceipt is the correct blueprint for US Uber ride receipts:
+// despite the misleading sender_domain field, it targets emails From: uber.com
+// that are DKIM-signed by the sptrans.uber.com subdomain — which is how Uber
+// actually signs all its production transactional mail. v11 is the latest.
+const BLUEPRINT_SLUG = "rutefig/UberReceipt@v11";
+const GMAIL_QUERY = "from:uber.com";
 
 type EmailCandidate = {
   id: string;
