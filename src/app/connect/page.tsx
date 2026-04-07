@@ -5,11 +5,8 @@ import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { NetworkPanel } from "@/components/NetworkPanel";
 import { ProofAnimation } from "@/components/ProofAnimation";
-import {
-  preloadGoogleAuth,
-  requestGmailAccessToken,
-  OAuthDismissedError,
-} from "@/lib/google-auth";
+import { OAuthDismissedError } from "@/lib/google-auth";
+import { manualGmailAuth } from "@/lib/google-auth-manual";
 import { listMessages, fetchRawMessage, extractPreview } from "@/lib/gmail";
 import { proveEmail, type ProofResult } from "@/lib/prover";
 
@@ -37,20 +34,13 @@ type ConnectState =
 export default function ConnectPage() {
   const [state, setState] = useState<ConnectState>({ phase: "idle" });
 
-  // Preload GIS at page mount so the click handler can call requestAccessToken()
-  // synchronously without consuming the user-activation token via async awaits.
-  useEffect(() => {
-    preloadGoogleAuth().catch((err) => {
-      console.warn("[redactable] GIS preload failed:", err);
-    });
-  }, []);
-
   async function startFlow() {
-    // Kick off the popup synchronously inside the click handler so the user
-    // gesture is still alive. Then await the result.
+    // Open the OAuth popup synchronously inside the click handler so the
+    // user gesture is preserved. manualGmailAuth uses our own /oauth/callback
+    // page + postMessage instead of GIS, which has been unreliable for us.
     let tokenPromise: Promise<string>;
     try {
-      tokenPromise = requestGmailAccessToken();
+      tokenPromise = manualGmailAuth();
     } catch (err) {
       setState({
         phase: "error",
@@ -68,7 +58,8 @@ export default function ConnectPage() {
         if (err instanceof OAuthDismissedError) {
           setState({
             phase: "idle",
-            hint: "Sign-in was cancelled. Click Connect again — and if you don't see the popup, allow popups for this site in your browser.",
+            hint: err.message ||
+              "Sign-in was cancelled. Click Connect again — and if you don't see the popup, allow popups for this site in your browser.",
           });
           return;
         }
