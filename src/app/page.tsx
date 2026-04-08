@@ -1,6 +1,5 @@
 import { Logo } from "@/components/Logo";
 import { NetworkPanel } from "@/components/NetworkPanel";
-import { Estimator } from "@/components/Estimator";
 import { RedactLine } from "@/components/RedactLine";
 
 export default function Home() {
@@ -8,11 +7,10 @@ export default function Home() {
     <main className="flex-1 flex flex-col">
       <Nav />
       <Hero />
-      <Thesis />
+      <Problem />
       <SeenVsNotSeen />
-      <WhoPays />
-      <EarningsSection />
       <HowItWorks />
+      <Pricing />
       <FAQ />
       <FinalCTA />
       <Footer />
@@ -29,14 +27,14 @@ function Nav() {
       <div className="max-w-[1280px] mx-auto flex items-center justify-between px-6 py-4">
         <Logo size="sm" variant="reactive" />
         <div className="hidden md:flex items-center gap-8 text-[14px] text-[var(--color-ink-2)]">
-          <a href="#thesis" className="hover:text-[var(--color-ink)] transition">
-            Thesis
+          <a href="#problem" className="hover:text-[var(--color-ink)] transition">
+            Why
           </a>
           <a href="#how" className="hover:text-[var(--color-ink)] transition">
             How
           </a>
-          <a href="#buyers" className="hover:text-[var(--color-ink)] transition">
-            Who pays
+          <a href="#pricing" className="hover:text-[var(--color-ink)] transition">
+            Pricing
           </a>
           <a href="#faq" className="hover:text-[var(--color-ink)] transition">
             FAQ
@@ -49,10 +47,10 @@ function Nav() {
           </a>
         </div>
         <a
-          href="/connect"
+          href="#access"
           className="inline-flex items-center rounded-sm bg-[var(--color-amber)] hover:bg-[var(--color-amber-hover)] text-black px-4 py-2 text-[14px] font-medium transition"
         >
-          Try the demo →
+          Request access →
         </a>
       </div>
     </nav>
@@ -70,52 +68,50 @@ function Hero() {
         <div className="animate-fade-up">
           <div className="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--color-amber)] mb-10">
             <span className="inline-block w-1 h-1 rounded-full bg-[var(--color-amber)] animate-pulse-dot" />
-            V0 Beta · Live May 2026
+            V0 Beta · May 2026 · Income verification for landlords
           </div>
 
           <h1 className="font-display text-[64px] sm:text-[88px] md:text-[112px] leading-[0.9] tracking-[-0.02em] text-[var(--color-ink)]">
-            You&apos;re not the
+            Proof of
             <br />
-            <span className="italic text-[var(--color-ink-2)]">product</span>
+            <span className="italic text-[var(--color-ink-2)]">income</span>.
             <br />
-            anymore.
+            No Plaid.
           </h1>
 
           <p className="mt-10 max-w-xl text-[19px] leading-[1.5] text-[var(--color-ink-muted)]">
-            Your inbox is worth money to researchers. We built the vault that
-            lets you sell it{" "}
+            Send a link to your applicant. They sign into Gmail. Their browser
+            reads one payroll email and hands you the verified numbers.{" "}
             <span className="text-[var(--color-ink-2)]">
-              without anyone — including us — ever reading it
-            </span>
-            .
+              Employer. Gross. Pay date. Nothing else.
+            </span>{" "}
+            The paystub never leaves their machine. We never see it either.
           </p>
 
           <div className="mt-10 flex flex-wrap items-center gap-4">
             <a
-              href="/connect"
+              href="#access"
               className="inline-flex items-center gap-2 rounded-sm bg-[var(--color-amber)] hover:bg-[var(--color-amber-hover)] text-black px-6 py-3.5 text-[15px] font-medium transition"
             >
-              Try the V0 demo
+              Request access
               <span aria-hidden>→</span>
             </a>
             <a
-              href="#waitlist"
+              href="/connect"
               className="inline-flex items-center gap-2 rounded-sm border border-[var(--color-border)] bg-white/[0.02] hover:bg-white/[0.06] text-[var(--color-ink-2)] px-6 py-3.5 text-[15px] transition"
             >
-              Waitlist for V1
+              Watch the math run
             </a>
           </div>
           <p className="mt-4 font-mono text-[11px] text-[var(--color-ink-quiet)] max-w-md leading-relaxed">
-            V0 proves Uber ride receipts, no dollar amounts yet. V1 ships the
-            first dollar-extracting blueprints in May.
+            First 10 verifications free. $5 each after. No subscription, no
+            seat fees, no setup.
           </p>
 
           <div className="mt-12 flex items-center gap-6 font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--color-ink-quiet)]">
-            <span>USA only</span>
+            <span>Gusto · Rippling · Justworks</span>
             <span>·</span>
-            <span>Gmail + Outlook</span>
-            <span>·</span>
-            <span>Zero PII</span>
+            <span>ADP next</span>
           </div>
         </div>
 
@@ -133,63 +129,112 @@ function Hero() {
 }
 
 /* ============================================================
-   THESIS — the manifesto
+   PROBLEM — the three broken options
    ============================================================ */
-function Thesis() {
+function Problem() {
   return (
-    <section id="thesis" className="max-w-[1280px] mx-auto px-6 py-32 md:py-48">
+    <section id="problem" className="max-w-[1280px] mx-auto px-6 py-32 md:py-48">
       <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--color-amber)] mb-8">
-        01 · Thesis
+        01 · The problem
       </div>
       <h2 className="font-display text-[44px] sm:text-[64px] md:text-[80px] leading-[0.95] tracking-[-0.015em] text-[var(--color-ink)] max-w-5xl">
-        Your data has been a fire sale since the early 2000s.
+        Every income check today is broken.
         <br />
         <span className="text-[var(--color-ink-muted)]">
-          Brokers made billions.
+          The applicant hates it.
         </span>
         <br />
-        <span className="text-[var(--color-ink-muted)]">You made nothing.</span>
-        <br />
-        <span className="italic">We&apos;re renegotiating the contract.</span>
+        <span className="italic">You pay for it anyway.</span>
       </h2>
 
-      <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl">
-        <Stat value="$250B" label="global data broker market in 2026" />
-        <Stat value="$0" label="of that ever reached you" />
-        <Stat value="80/20" label="split, in your favor" />
+      <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <BrokenCard
+          tag="Option A"
+          title="Plaid."
+          body="You ask a stranger for their online banking login. Half of them bail before they finish. The ones who do hand over their entire financial life for one number. You paid $8 to $25 for the privilege."
+          cost="$8 – $25"
+          costLabel="per check"
+        />
+        <BrokenCard
+          tag="Option B"
+          title="PDF upload."
+          body="The applicant drags a paystub into a form. It took thirty seconds to forge in Photoshop. You can't tell the difference. The fraud rate on self-reported income docs is 15% and climbing."
+          cost="$0"
+          costLabel="and forged in 30 seconds"
+        />
+        <BrokenCard
+          tag="Option C"
+          title="Background check."
+          body="TransUnion SmartMove, Experian, RentPrep. They pull credit, they pull criminal records, they pull pet history. They still can't verify income without one of the above."
+          cost="$30 – $45"
+          costLabel="per applicant"
+        />
       </div>
+
+      <p className="mt-16 max-w-3xl text-[18px] text-[var(--color-ink-muted)] leading-relaxed">
+        There is a fourth option.{" "}
+        <span className="text-[var(--color-ink-2)]">
+          The payroll provider already signs every paystub email with a
+          cryptographic signature.
+        </span>{" "}
+        Gmail keeps a copy. The math has been sitting in your applicant&apos;s
+        inbox the whole time. Nobody was reading it.
+      </p>
     </section>
   );
 }
 
-function Stat({ value, label }: { value: string; label: string }) {
+function BrokenCard({
+  tag,
+  title,
+  body,
+  cost,
+  costLabel,
+}: {
+  tag: string;
+  title: string;
+  body: string;
+  cost: string;
+  costLabel: string;
+}) {
   return (
-    <div>
-      <div className="font-display text-[56px] leading-none text-[var(--color-ink)]">
-        {value}
+    <div className="rounded-lg border border-[var(--color-border)] bg-white/[0.02] p-8 flex flex-col">
+      <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--color-ink-quiet)] mb-6">
+        {tag}
       </div>
-      <div className="font-mono text-[11px] uppercase tracking-widest text-[var(--color-ink-quiet)] mt-3">
-        {label}
+      <div className="font-display text-[40px] leading-none text-[var(--color-ink)] mb-5">
+        {title}
+      </div>
+      <p className="text-[15px] leading-relaxed text-[var(--color-ink-muted)] mb-8 flex-1">
+        {body}
+      </p>
+      <div className="pt-6 border-t border-[var(--color-border-subtle)]">
+        <div className="font-display text-[28px] text-[var(--color-danger)]">
+          {cost}
+        </div>
+        <div className="font-mono text-[10px] uppercase tracking-widest text-[var(--color-ink-quiet)] mt-1">
+          {costLabel}
+        </div>
       </div>
     </div>
   );
 }
 
 /* ============================================================
-   SEEN vs NOT SEEN — the whole privacy pitch
+   SEEN vs NOT SEEN — what the PM gets, what the applicant keeps
    ============================================================ */
 function SeenVsNotSeen() {
   return (
     <section className="bg-[var(--color-panel)] border-y border-[var(--color-border-subtle)] py-32">
       <div className="max-w-[1280px] mx-auto px-6">
         <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--color-amber)] mb-8">
-          02 · The Math
+          02 · The payload
         </div>
         <h2 className="font-display text-[44px] sm:text-[64px] leading-[0.95] tracking-[-0.015em] text-[var(--color-ink)] max-w-4xl mb-16">
-          What leaves your browser.
+          What you receive.
           <br />
           <span className="text-[var(--color-ink-muted)] italic">
-            And what doesn&apos;t.
+            And what you don&apos;t.
           </span>
         </h2>
 
@@ -199,21 +244,21 @@ function SeenVsNotSeen() {
             <div className="flex items-center gap-3 mb-6">
               <span className="inline-block w-2 h-2 rounded-full bg-[var(--color-danger)]" />
               <span className="font-mono text-[11px] uppercase tracking-widest text-[var(--color-ink-quiet)]">
-                stays in your browser · nobody sees this
+                stays in their browser · you never see it
               </span>
             </div>
             <ul className="space-y-3 text-[15px]">
               {[
-                "Your email address",
-                "Your name",
-                "Your home address",
-                "Your phone number",
-                "Your credit card digits",
-                "Item-level detail (what exactly you ordered)",
-                "The people you email",
-                "Your password",
-                "Your other messages",
-                "Anything else Google has on you",
+                "Bank account numbers",
+                "Bank balance",
+                "Other deposits",
+                "Other employers",
+                "Line-item tax withholdings",
+                "Retirement contributions",
+                "Health insurance deductions",
+                "Social Security number",
+                "Home address",
+                "Every other email in their inbox",
               ].map((item, i) => (
                 <li key={item}>
                   <RedactLine delay={150 + i * 120}>{item}</RedactLine>
@@ -227,34 +272,33 @@ function SeenVsNotSeen() {
             <div className="flex items-center gap-3 mb-6">
               <span className="inline-block w-2 h-2 rounded-full bg-[var(--color-ok)]" />
               <span className="font-mono text-[11px] uppercase tracking-widest text-[var(--color-ink-quiet)]">
-                ships in the proof · the valuable part
+                ships in the proof · what you get
               </span>
             </div>
             <pre className="font-mono text-[12px] leading-relaxed text-[var(--color-ink-2)] overflow-x-auto">
 {`{
-  `}<span className="text-[var(--color-amber)]">merchant</span>{`:        "DoorDash",
-  `}<span className="text-[var(--color-amber)]">merchant_domain</span>{`: "doordash.com",
-  `}<span className="text-[var(--color-amber)]">category</span>{`:        "food_delivery",
-  `}<span className="text-[var(--color-amber)]">amount_cents</span>{`:    3420,
-  `}<span className="text-[var(--color-amber)]">currency</span>{`:        "USD",
-  `}<span className="text-[var(--color-amber)]">tip_cents</span>{`:       520,
-  `}<span className="text-[var(--color-amber)]">timestamp</span>{`:       "2026-04-03T14:22:00Z",
-  `}<span className="text-[var(--color-amber)]">metro</span>{`:           "US-NY-NYC",
-  `}<span className="text-[var(--color-amber)]">payment_method</span>{`:  "card",
-  `}<span className="text-[var(--color-amber)]">is_first_order</span>{`:  false,
-  `}<span className="text-[var(--color-amber)]">dkim_valid</span>{`:      true,
-  `}<span className="text-[var(--color-amber)]">anon_user_id</span>{`:    "p_8f2a...c91b",
-  `}<span className="text-[var(--color-amber)]">proof</span>{`:           "0x7f3a...c91b"
+  `}<span className="text-[var(--color-amber)]">employer</span>{`:          "Acme Inc.",
+  `}<span className="text-[var(--color-amber)]">payroll_provider</span>{`:  "gusto",
+  `}<span className="text-[var(--color-amber)]">gross_cents</span>{`:       625000,
+  `}<span className="text-[var(--color-amber)]">net_cents</span>{`:         478230,
+  `}<span className="text-[var(--color-amber)]">pay_period</span>{`:        "2026-03-16/2026-03-31",
+  `}<span className="text-[var(--color-amber)]">pay_date</span>{`:          "2026-04-01",
+  `}<span className="text-[var(--color-amber)]">frequency</span>{`:         "semimonthly",
+  `}<span className="text-[var(--color-amber)]">ytd_gross_cents</span>{`:   2812500,
+  `}<span className="text-[var(--color-amber)]">dkim_domain</span>{`:       "gusto.com",
+  `}<span className="text-[var(--color-amber)]">dkim_valid</span>{`:        true,
+  `}<span className="text-[var(--color-amber)]">issued_at</span>{`:         "2026-04-01T09:14:00Z",
+  `}<span className="text-[var(--color-amber)]">proof</span>{`:             "0x7f3a...c91b"
 }`}
             </pre>
             <div className="mt-6 pt-6 border-t border-[var(--color-border-subtle)] text-[12px] text-[var(--color-ink-muted)] leading-relaxed">
-              The merchant, amount, category, metro, and timestamp are the
-              signal funds pay for.{" "}
+              Every field is bound to the payroll provider&apos;s own DKIM
+              signature.{" "}
               <span className="text-[var(--color-ink-2)]">
-                None of this can be traced back to you
-              </span>
-              . The anon_user_id is a one-way poseidon hash — stable across
-              your own receipts so a panel works, unreversible to your email.
+                Modifying a single byte breaks the proof.
+              </span>{" "}
+              No Photoshop attack works. No copy-paste attack works. No SaaS
+              impersonation attack works. It&apos;s math, not policy.
             </div>
           </div>
         </div>
@@ -262,9 +306,9 @@ function SeenVsNotSeen() {
         <p className="mt-12 max-w-3xl font-mono text-[13px] leading-relaxed text-[var(--color-ink-quiet)]">
           The browser is hard-locked via Content-Security-Policy headers.
           connect-src is whitelisted to Google&apos;s APIs and nothing else.
-          If a future bug or dependency ever tries to POST the contents of
-          your email anywhere, the browser blocks the request. The promise
-          is architectural, not aspirational.{" "}
+          If a future bug or dependency ever tries to POST the contents of a
+          paystub anywhere, the browser refuses the request. The promise is
+          architectural, not aspirational.{" "}
           <a
             href="https://github.com/mgsturdy/redactable/blob/main/next.config.ts"
             className="text-[var(--color-amber)] hover:underline"
@@ -278,152 +322,34 @@ function SeenVsNotSeen() {
 }
 
 /* ============================================================
-   WHO PAYS — 3 buyer personas
-   ============================================================ */
-function WhoPays() {
-  return (
-    <section id="buyers" className="max-w-[1280px] mx-auto px-6 py-32">
-      <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--color-amber)] mb-8">
-        03 · Who pays
-      </div>
-      <h2 className="font-display text-[44px] sm:text-[64px] leading-[0.95] tracking-[-0.015em] text-[var(--color-ink)] max-w-4xl mb-4">
-        Researchers. Not advertisers.
-      </h2>
-      <p className="text-[var(--color-ink-muted)] text-[18px] max-w-2xl mb-16">
-        Three buyers. None of them want you as a target. All of them want the
-        signal without the PII.
-      </p>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <BuyerCard
-          tag="Alt-data funds"
-          title="The $50B fund."
-          body="They want to read DoorDash's next earnings report thirty days before it prints. Aggregated verified receipts across 10,000 real users tell them whether Q3 beat consensus. They pay $50k to $500k per dataset, per quarter."
-          price="$0.15 – $0.40"
-          priceLabel="per verified receipt"
-        />
-        <BuyerCard
-          tag="Academia"
-          title="The Stanford paper."
-          body="Her consumer behavior study needs real spending data without an IRB nightmare. Verified panels from verified humans, with cryptographic provenance, sold per-record. Published papers, not ad targeting."
-          price="$2 – $10"
-          priceLabel="per panelist / month"
-        />
-        <BuyerCard
-          tag="Underwriters"
-          title="The credit union."
-          body="Your bank statement can be faked. Your Uber Eats payout emails can't. Lenders pay for proof-of-income that can't be forged, sent directly by you when you apply for a loan. You get cut in every time."
-          price="$5 – $25"
-          priceLabel="per verified claim"
-        />
-      </div>
-
-      <p className="mt-12 font-mono text-[12px] text-[var(--color-ink-quiet)] max-w-3xl">
-        * Not in scope: ad networks, data brokers, anyone who wants to target
-        you back. If we ever accept that kind of buyer, we stop being
-        Redactable.
-      </p>
-    </section>
-  );
-}
-
-function BuyerCard({
-  tag,
-  title,
-  body,
-  price,
-  priceLabel,
-}: {
-  tag: string;
-  title: string;
-  body: string;
-  price: string;
-  priceLabel: string;
-}) {
-  return (
-    <div className="rounded-lg border border-[var(--color-border)] bg-white/[0.02] p-8 flex flex-col">
-      <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--color-ink-quiet)] mb-6">
-        {tag}
-      </div>
-      <div className="font-display text-[32px] leading-none text-[var(--color-ink)] mb-5">
-        {title}
-      </div>
-      <p className="text-[15px] leading-relaxed text-[var(--color-ink-muted)] mb-8 flex-1">
-        {body}
-      </p>
-      <div className="pt-6 border-t border-[var(--color-border-subtle)]">
-        <div className="font-display text-[28px] text-[var(--color-amber)]">
-          {price}
-        </div>
-        <div className="font-mono text-[10px] uppercase tracking-widest text-[var(--color-ink-quiet)] mt-1">
-          {priceLabel}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ============================================================
-   EARNINGS
-   ============================================================ */
-function EarningsSection() {
-  return (
-    <section className="bg-[var(--color-panel)] border-y border-[var(--color-border-subtle)] py-32">
-      <div className="max-w-[1280px] mx-auto px-6">
-        <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--color-amber)] mb-8">
-          04 · Your cut
-        </div>
-        <h2 className="font-display text-[44px] sm:text-[64px] leading-[0.95] tracking-[-0.015em] text-[var(--color-ink)] max-w-4xl mb-4">
-          Drag the sliders.
-          <br />
-          <span className="text-[var(--color-ink-muted)] italic">
-            Find out what you&apos;ve been giving away.
-          </span>
-        </h2>
-        <p className="text-[var(--color-ink-muted)] text-[17px] max-w-2xl mb-12">
-          Honest numbers, benchmarked against current alt-data market rates.
-          We split 80/20 in your favor, always.
-        </p>
-        <Estimator />
-      </div>
-    </section>
-  );
-}
-
-/* ============================================================
    HOW IT WORKS
    ============================================================ */
 function HowItWorks() {
   const steps = [
     {
       n: "01",
-      title: "Google hands your emails to your browser.",
-      body: "Not to us. You OAuth directly with Google. The token never touches our server. We have no session, no backend auth route, nothing to leak.",
+      title: "You paste their email. We send the link.",
+      body: "Drop the applicant's email into a single field. Redactable sends them a one-time link. No account on your end. No account on theirs. No app to install. No invoice to chase.",
     },
     {
       n: "02",
-      title: "Your laptop does the math.",
-      body: "A zero-knowledge prover runs in a Web Worker in your tab, built on zk.email's open-source SDK — the same cryptography that powers zkP2P and Clave. Sixty to one hundred eighty seconds per receipt. Slower than remote proving. That's the whole point.",
+      title: "They sign in to Gmail. Their browser does the math.",
+      body: "Read-only Gmail access, scoped to payroll senders only (gusto.com, rippling.com, justworks.com, adp.com). A zero-knowledge prover runs in their tab, built on zk.email's open-source SDK. Sixty to one-hundred-eighty seconds. Their token, their laptop, their math.",
     },
     {
       n: "03",
-      title: "You review what the proof contains.",
-      body: "Line by line. Every field that will be published is shown to you before it ships. If you don't like what it says, hit cancel. Nothing leaves.",
-    },
-    {
-      n: "04",
-      title: "You publish. The proof ships. You get paid.",
-      body: "Only the finished proof is uploaded. Our server receives a ~20KB JSON blob of math and nothing else. Buyers get verified data. You get your cut.",
+      title: "You get the verified numbers. Nothing else.",
+      body: "Employer, gross, net, pay date, frequency, YTD. Cryptographically bound to the payroll provider's DKIM key. Delivered to your inbox the moment the applicant approves the release. You verify their income in the time it used to take Plaid to load.",
     },
   ];
 
   return (
     <section id="how" className="max-w-[1280px] mx-auto px-6 py-32">
       <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--color-amber)] mb-8">
-        05 · How it actually works
+        03 · How it works
       </div>
       <h2 className="font-display text-[44px] sm:text-[64px] leading-[0.95] tracking-[-0.015em] text-[var(--color-ink)] max-w-4xl mb-16">
-        Four steps. Zero servers touching your email.
+        Three steps. No servers touching the paystub.
       </h2>
       <div className="space-y-0 border-t border-[var(--color-border-subtle)]">
         {steps.map((step) => (
@@ -448,64 +374,69 @@ function HowItWorks() {
 }
 
 /* ============================================================
-   FAQ
+   PRICING
    ============================================================ */
-function FAQ() {
-  const qs = [
-    {
-      q: "Can you see my emails?",
-      a: "No. The browser blocks us. Read the Content-Security-Policy header on this page. connect-src is whitelisted to Google's APIs and our own origin. If any code on this page tries to POST the contents of your email anywhere else, the browser refuses the request.",
-    },
-    {
-      q: "What if you get hacked?",
-      a: "There's nothing to steal. Our database contains finished zero-knowledge proofs. Proofs contain math. Math is not personal data. Even if we shipped every row tomorrow, no inbox contents would leak.",
-    },
-    {
-      q: "Is this legal?",
-      a: "USA only on purpose. California's CCPA governs the resale of personal information, and our whole design avoids that category: the proofs contain no personal information by construction. Once we onboard actual buyers we'll register as a data broker in California. GDPR is deliberately out of scope for V1.",
-    },
-    {
-      q: "Who actually pays for this?",
-      a: "Alt-data hedge funds, academic researchers, credit underwriters. Not ad networks. Not data brokers. Not your employer. If we ever accept that kind of buyer, we stop being Redactable.",
-    },
-    {
-      q: "Why should I trust you?",
-      a: "Don't. The entire browser client is open source. Audit every line. If you find a way email contents could leak, file an issue and we'll fix it publicly.",
-    },
-    {
-      q: "How slow is the proof?",
-      a: "Sixty to one-hundred eighty seconds per email on a normal laptop. Remote proving exists and is faster, but that would require sending the raw email to someone. We refuse the trade.",
-    },
-    {
-      q: "Gmail only?",
-      a: "Gmail and Outlook. Both flow through the same client-side SDK. Yahoo, iCloud, and ProtonMail are on the roadmap once V1 ships.",
-    },
-    {
-      q: "What if Google gets subpoenaed?",
-      a: "That's between you and Google. We're not in the chain. We don't have your token, your emails, or your identity. Our database contains proofs attached to a random user ID you control.",
-    },
-  ];
-
+function Pricing() {
   return (
-    <section id="faq" className="bg-[var(--color-panel)] border-y border-[var(--color-border-subtle)] py-32">
+    <section id="pricing" className="bg-[var(--color-panel)] border-y border-[var(--color-border-subtle)] py-32">
       <div className="max-w-[1280px] mx-auto px-6">
         <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--color-amber)] mb-8">
-          06 · Obvious questions
+          04 · Pricing
         </div>
         <h2 className="font-display text-[44px] sm:text-[64px] leading-[0.95] tracking-[-0.015em] text-[var(--color-ink)] max-w-4xl mb-16">
-          The ones we&apos;d ask too.
+          One number.
+          <br />
+          <span className="italic text-[var(--color-ink-muted)]">
+            Lower than Plaid.
+          </span>
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-12 max-w-6xl">
-          {qs.map((item) => (
-            <div key={item.q}>
-              <div className="font-display text-[24px] leading-tight text-[var(--color-ink)] mb-3">
-                {item.q}
-              </div>
-              <p className="text-[15px] leading-relaxed text-[var(--color-ink-muted)]">
-                {item.a}
-              </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-[1.2fr_1fr] gap-8 items-start">
+          <div className="rounded-lg border border-[var(--color-amber)] bg-[var(--color-amber-muted)] p-12">
+            <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--color-amber)] mb-4">
+              Pay as you go
             </div>
-          ))}
+            <div className="flex items-baseline gap-3 mb-8">
+              <span className="font-display text-[96px] leading-none text-[var(--color-ink)]">
+                $5
+              </span>
+              <span className="font-mono text-[13px] uppercase tracking-widest text-[var(--color-ink-muted)]">
+                per verification
+              </span>
+            </div>
+            <ul className="space-y-3 text-[15px] text-[var(--color-ink-2)]">
+              <li>• First 10 verifications free</li>
+              <li>• No subscription, no seat fees, no setup</li>
+              <li>• You get billed when a proof lands in your inbox</li>
+              <li>• Cancel by closing the tab</li>
+            </ul>
+          </div>
+
+          <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-canvas)] p-12">
+            <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--color-ink-quiet)] mb-4">
+              What you were paying
+            </div>
+            <ul className="space-y-6 text-[15px] text-[var(--color-ink-2)]">
+              <li className="flex items-baseline justify-between gap-4">
+                <span>Plaid / Argyle / Pinwheel</span>
+                <span className="font-display text-[22px] text-[var(--color-danger)]">
+                  $8 – $25
+                </span>
+              </li>
+              <li className="flex items-baseline justify-between gap-4">
+                <span>TransUnion SmartMove</span>
+                <span className="font-display text-[22px] text-[var(--color-danger)]">
+                  $30 – $45
+                </span>
+              </li>
+              <li className="flex items-baseline justify-between gap-4">
+                <span>PDF paystub (fraud loss)</span>
+                <span className="font-display text-[22px] text-[var(--color-danger)]">
+                  one bad tenant
+                </span>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </section>
@@ -513,38 +444,109 @@ function FAQ() {
 }
 
 /* ============================================================
-   FINAL CTA — waitlist
+   FAQ
+   ============================================================ */
+function FAQ() {
+  const qs = [
+    {
+      q: "Is this FCRA compliant?",
+      a: "Yes. Consumer-permissioned data sharing, the same exemption Argyle and Pinwheel operate under. The applicant is the one disclosing their paystub to you through a tool they control. Redactable is not a consumer reporting agency and does not sell or resell the data.",
+    },
+    {
+      q: "Which payroll providers work?",
+      a: "Gusto, Rippling, and Justworks at launch. ADP, Paychex, QuickBooks Payroll, and Workday ship next. If your applicants use something else, tell us and we'll move it up the list.",
+    },
+    {
+      q: "What if the applicant is 1099 or self-employed?",
+      a: "Different flow. Stripe receipts, platform payout emails, or direct deposit summaries all work. We're shipping those blueprints next. Email us if you need one now.",
+    },
+    {
+      q: "What does the applicant actually do?",
+      a: "Click the link. Sign in with Google. Review which fields will ship to you. Approve or cancel. Sixty to one hundred eighty seconds, start to finish. No account, no password, no install.",
+    },
+    {
+      q: "What does Redactable see?",
+      a: "The cryptographic proof and the extracted fields. A ~20KB blob of math. We never see the raw email, the applicant's Google token, or their inbox. Our database has nothing that could identify them.",
+    },
+    {
+      q: "What if the proof is forged?",
+      a: "It can't be. Every field is bound to the payroll provider's own DKIM signature. Modifying a single byte of the gross pay number breaks the proof. Modifying the employer name breaks the proof. The math won't let you lie.",
+    },
+    {
+      q: "Do I need a dashboard or account?",
+      a: "Not yet. V0 is deliberately boring: paste an email, we send a link, you get a result in your inbox. API, webhooks, and a dashboard ship with V1 once we know what you actually need.",
+    },
+    {
+      q: "What if the payroll email is too old or got deleted?",
+      a: "The applicant picks which email to prove. If they've deleted every paystub in their Gmail, this flow won't find one. We return a clean 'no match' and you can fall back to your existing process.",
+    },
+  ];
+
+  return (
+    <section id="faq" className="max-w-[1280px] mx-auto px-6 py-32">
+      <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--color-amber)] mb-8">
+        05 · Obvious questions
+      </div>
+      <h2 className="font-display text-[44px] sm:text-[64px] leading-[0.95] tracking-[-0.015em] text-[var(--color-ink)] max-w-4xl mb-16">
+        The ones we&apos;d ask too.
+      </h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-12 max-w-6xl">
+        {qs.map((item) => (
+          <div key={item.q}>
+            <div className="font-display text-[24px] leading-tight text-[var(--color-ink)] mb-3">
+              {item.q}
+            </div>
+            <p className="text-[15px] leading-relaxed text-[var(--color-ink-muted)]">
+              {item.a}
+            </p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ============================================================
+   FINAL CTA — access form
    ============================================================ */
 function FinalCTA() {
   return (
-    <section id="waitlist" className="max-w-[1280px] mx-auto px-6 py-32 md:py-48 text-center">
-      <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--color-amber)] mb-8">
-        Reserve your cut
+    <section
+      id="access"
+      className="bg-[var(--color-panel)] border-y border-[var(--color-border-subtle)] py-32 md:py-48 text-center"
+    >
+      <div className="max-w-[1280px] mx-auto px-6">
+        <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--color-amber)] mb-8">
+          Get early access
+        </div>
+        <h2 className="font-display text-[56px] sm:text-[96px] md:text-[120px] leading-[0.9] tracking-[-0.02em] text-[var(--color-ink)] max-w-5xl mx-auto">
+          Your next applicant
+          <br />
+          can prove income
+          <br />
+          <span className="italic text-[var(--color-amber)]">in 60 seconds</span>.
+        </h2>
+        <p className="mt-10 text-[18px] text-[var(--color-ink-muted)] max-w-xl mx-auto">
+          Drop your email. We&apos;ll send you ten free verifications and a
+          link your applicants can use today.
+        </p>
+        <form className="mt-12 max-w-md mx-auto flex flex-col sm:flex-row gap-3">
+          <input
+            type="email"
+            placeholder="you@property.com"
+            className="flex-1 rounded-sm bg-white/[0.04] border border-[var(--color-border)] px-5 py-3.5 text-[15px] text-[var(--color-ink)] placeholder:text-[var(--color-ink-quiet)] focus:outline-none focus:border-[var(--color-amber)] transition"
+          />
+          <button
+            type="submit"
+            className="rounded-sm bg-[var(--color-amber)] hover:bg-[var(--color-amber-hover)] text-black px-6 py-3.5 text-[15px] font-medium transition"
+          >
+            Request access
+          </button>
+        </form>
+        <p className="mt-6 font-mono text-[11px] uppercase tracking-widest text-[var(--color-ink-quiet)]">
+          No sales call. No contract. We&apos;ll email you a link.
+        </p>
       </div>
-      <h2 className="font-display text-[56px] sm:text-[96px] md:text-[128px] leading-[0.9] tracking-[-0.02em] text-[var(--color-ink)] max-w-5xl mx-auto">
-        Your inbox is{" "}
-        <span className="italic text-[var(--color-amber)]">holding money</span>.
-      </h2>
-      <p className="mt-8 text-[18px] text-[var(--color-ink-muted)] max-w-xl mx-auto">
-        First thousand users get priority payouts and a lifetime bump on the
-        split.
-      </p>
-      <form className="mt-12 max-w-md mx-auto flex flex-col sm:flex-row gap-3">
-        <input
-          type="email"
-          placeholder="you@inbox.com"
-          className="flex-1 rounded-sm bg-white/[0.04] border border-[var(--color-border)] px-5 py-3.5 text-[15px] text-[var(--color-ink)] placeholder:text-[var(--color-ink-quiet)] focus:outline-none focus:border-[var(--color-amber)] transition"
-        />
-        <button
-          type="submit"
-          className="rounded-sm bg-[var(--color-amber)] hover:bg-[var(--color-amber-hover)] text-black px-6 py-3.5 text-[15px] font-medium transition"
-        >
-          Join waitlist
-        </button>
-      </form>
-      <p className="mt-6 font-mono text-[11px] uppercase tracking-widest text-[var(--color-ink-quiet)]">
-        We&apos;ll email you when V1 opens. Nothing else.
-      </p>
     </section>
   );
 }
@@ -560,16 +562,16 @@ function Footer() {
           <div className="col-span-2">
             <Logo size="sm" />
             <p className="mt-4 text-[14px] leading-relaxed text-[var(--color-ink-muted)] max-w-sm">
-              Sell verified spend data from your email. Without ever showing
-              the email. Without ever trusting us.
+              Verified income from a payroll email. Without the bank login.
+              Without the PDF. Without ever trusting us.
             </p>
           </div>
           <FooterCol
             title="Product"
             links={[
+              ["Why", "#problem"],
               ["How it works", "#how"],
-              ["Who pays", "#buyers"],
-              ["Estimator", "#earnings"],
+              ["Pricing", "#pricing"],
               ["FAQ", "#faq"],
             ]}
           />
@@ -579,7 +581,7 @@ function Footer() {
               ["Open source", "https://github.com/mgsturdy/redactable"],
               ["CSP policy", "https://github.com/mgsturdy/redactable/blob/main/next.config.ts"],
               ["Report a leak", "https://github.com/mgsturdy/redactable/issues"],
-              ["Contribute", "https://github.com/mgsturdy/redactable"],
+              ["Watch the math run", "/connect"],
             ]}
           />
         </div>
